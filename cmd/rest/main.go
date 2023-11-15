@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os/signal"
@@ -11,9 +12,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hifat/con-q/internal/app/di"
 	"github.com/hifat/con-q/internal/app/routes/routeV1"
+	"github.com/hifat/con-q/internal/pkg/config"
 )
 
 func main() {
+	cfg := config.LoadAppConfig()
+	fmt.Println("===cfg.DB.Host===")
+	fmt.Println(cfg.DB.Host)
+	fmt.Println("===cfg.DB.Host===")
+
 	wireHandler, cleanUp := di.InitializeAPI()
 	defer cleanUp()
 
