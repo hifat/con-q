@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os/signal"
@@ -10,18 +9,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hifat/con-q/internal/app/config"
 	"github.com/hifat/con-q/internal/app/di"
 	"github.com/hifat/con-q/internal/app/routes/routeV1"
-	"github.com/hifat/con-q/internal/pkg/config"
 )
 
 func main() {
 	cfg := config.LoadAppConfig()
-	fmt.Println("===cfg.DB.Host===")
-	fmt.Println(cfg.DB.Host)
-	fmt.Println("===cfg.DB.Host===")
-
-	wireHandler, cleanUp := di.InitializeAPI()
+	wireHandler, cleanUp := di.InitializeAPI(cfg)
 	defer cleanUp()
 
 	router := gin.Default()
@@ -36,7 +31,7 @@ func main() {
 	defer stop()
 
 	srv := &http.Server{
-		Addr:           "localhost:8000",
+		Addr:           cfg.Env.AppHost + ":" + cfg.Env.AppPort,
 		Handler:        router,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,

@@ -8,13 +8,14 @@ package di
 
 import (
 	"github.com/google/wire"
+	"github.com/hifat/con-q/internal/app/config"
 	"github.com/hifat/con-q/internal/app/handler"
 	"github.com/hifat/con-q/internal/app/handler/healtzHdl"
 )
 
 // Injectors from wire.go:
 
-func InitializeAPI() (Adapter, func()) {
+func InitializeAPI(cfg *config.AppConfig) (Adapter, func()) {
 	healtzHandler := healtzHdl.New()
 	handlerHandler := handler.NewHandler(healtzHandler)
 	adapter := NewAdapter(handlerHandler)
