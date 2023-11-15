@@ -24,4 +24,4 @@ func InitializeAPI() (Adapter, func()) {
 
 // wire.go:
 
-var HandlerSet = wire.NewSet(handler.NewHandlerSet, healtzHdl.New)
+var HandlerSet = wire.NewSet(handler.NewHandler, healtzHdl.New)

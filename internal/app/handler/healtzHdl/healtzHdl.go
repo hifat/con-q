@@ -12,7 +12,7 @@ func New() HealtzHandler {
 	return HealtzHandler{}
 }
 
-func (h *HealtzHandler) Healtz(ctx *gin.Context) {
+func (h *HealtzHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "ok",
 	})

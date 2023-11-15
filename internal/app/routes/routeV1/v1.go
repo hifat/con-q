@@ -21,6 +21,6 @@ func New(router *gin.RouterGroup, handler handler.Handler) *Route {
 func (r *Route) Register() {
 	v1 := r.router.Group("v1")
 
-	healtzHandler := r.handler.HealtzHandler
-	v1.GET("/healtz", healtzHandler.Healtz)
+	healtzHandler := r.handler.Healtz
+	v1.GET("/healtz", healtzHandler.Get)
 }

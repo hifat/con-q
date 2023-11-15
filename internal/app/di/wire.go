@@ -15,7 +15,7 @@ import (
 // var ServiceSet = wire.NewSet()
 
 var HandlerSet = wire.NewSet(
-	handler.NewHandlerSet,
+	handler.NewHandler,
 	healtzHdl.New,
 )
 
