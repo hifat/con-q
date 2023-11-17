@@ -25,6 +25,6 @@ var HandlerSet = wire.NewSet(
 
 func InitializeAPI(cfg *config.AppConfig) (Adapter, func()) {
 	// wire.Build(AdapterSet, RepoSet, ServiceSet, HandlerSet)
-	wire.Build(AdapterSet, HandlerSet)
+	wire.Build(AdapterSet, RepoSet, HandlerSet)
 	return Adapter{}, nil
 }

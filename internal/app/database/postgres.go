@@ -21,7 +21,7 @@ func NewPostgresConnection(cfg config.DBConfig) (*gorm.DB, func()) {
 		DSN: dsn,
 	}), &gorm.Config{})
 	if err != nil {
-		panic("can't connect to database")
+		panic("can't connect to database: " + err.Error())
 	}
 
 	cleanup := func() {

@@ -18,6 +18,10 @@ make run
    fish_add_path $(go env GOPATH)/bin
    ```
 
+### Install Atlas
+
+[How to install](https://atlasgo.io/guides/orms/gorm#installation)
+
 ## Editor Setup
 
 ### VS Code
@@ -43,3 +47,16 @@ Fix wire.go in di Package Warning
    ```shell
    wire ./...
    ```
+ 
+### DB Fixing
+- When you fixed gorm model
+   ```shell
+   atlas migrate diff --env dev
+   ```
+
+## Deeployment
+
+Create `uuid-ossp` extension if not exists in your postgres
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+```

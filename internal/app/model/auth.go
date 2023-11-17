@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type auth struct {
+type Auth struct {
 	ID       uuid.UUID `gorm:"primaryKey; type:uuid; default:uuid_generate_v4()" json:"id"`
 	Token    string    `gorm:"type:text;unique" json:"token"`
 	Agent    string    `gorm:"type:varchar(100)" json:"agent"`
