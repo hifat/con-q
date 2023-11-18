@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hifat/con-q/internal/app/domain/authDomain"
-	"github.com/hifat/con-q/internal/app/handler/httpResponse"
-	"github.com/hifat/con-q/internal/pkg/validity"
+	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
+	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
+	"github.com/hifat/con-q-api/internal/pkg/validity"
 )
 
 type AuthHandler struct{}

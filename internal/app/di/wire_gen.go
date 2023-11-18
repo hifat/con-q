@@ -8,10 +8,10 @@ package di
 
 import (
 	"github.com/google/wire"
-	"github.com/hifat/con-q/internal/app/config"
-	"github.com/hifat/con-q/internal/app/handler"
-	"github.com/hifat/con-q/internal/app/handler/authHdl"
-	"github.com/hifat/con-q/internal/app/handler/healtzHdl"
+	"github.com/hifat/con-q-api/internal/app/config"
+	"github.com/hifat/con-q-api/internal/app/handler"
+	"github.com/hifat/con-q-api/internal/app/handler/authHdl"
+	"github.com/hifat/con-q-api/internal/app/handler/healtzHdl"
 )
 
 // Injectors from wire.go:

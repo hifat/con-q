@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hifat/con-q/internal/app/config"
-	"github.com/hifat/con-q/internal/app/di"
-	"github.com/hifat/con-q/internal/app/routes/routeV1"
-	"github.com/hifat/con-q/internal/pkg/validity"
+	"github.com/hifat/con-q-api/internal/app/config"
+	"github.com/hifat/con-q-api/internal/app/di"
+	"github.com/hifat/con-q-api/internal/app/routes/routeV1"
+	"github.com/hifat/con-q-api/internal/pkg/validity"
 )
 
 func main() {

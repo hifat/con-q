@@ -1,7 +1,7 @@
 package di
 
 import (
-	"github.com/hifat/con-q/internal/app/handler"
+	"github.com/hifat/con-q-api/internal/app/handler"
 
 	"github.com/google/wire"
 )

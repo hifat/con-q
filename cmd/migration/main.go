@@ -7,7 +7,7 @@ import (
 
 	_ "ariga.io/atlas-go-sdk/recordriver"
 	"ariga.io/atlas-provider-gorm/gormschema"
-	"github.com/hifat/con-q/internal/app/model"
+	"github.com/hifat/con-q-api/internal/app/model"
 )
 
 func main() {

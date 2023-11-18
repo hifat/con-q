@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hifat/con-q/internal/app/domain/errorDomain"
+	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
 )
 
 func Error(ctx *gin.Context, err any) {

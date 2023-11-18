@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 
-	"github.com/hifat/con-q/internal/app/config"
+	"github.com/hifat/con-q-api/internal/app/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

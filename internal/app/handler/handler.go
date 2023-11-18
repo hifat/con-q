@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/hifat/con-q/internal/app/handler/authHdl"
-	"github.com/hifat/con-q/internal/app/handler/healtzHdl"
+	"github.com/hifat/con-q-api/internal/app/handler/authHdl"
+	"github.com/hifat/con-q-api/internal/app/handler/healtzHdl"
 )
 
 type Handler struct {

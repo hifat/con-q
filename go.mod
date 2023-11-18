@@ -1,4 +1,4 @@
-module github.com/hifat/con-q
+module github.com/hifat/con-q-api
 
 go 1.21.4
 
