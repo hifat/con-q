@@ -47,7 +47,7 @@ func Validate(err error) validator.ValidationErrorsTranslations {
 
 	objErr := make(map[string]string)
 	for _, e := range err.(validator.ValidationErrors) {
-		objErr[e.StructField()] = e.Translate(Trans)
+		objErr[e.Field()] = e.Translate(Trans)
 	}
 
 	if os.Getenv("APP_MODE") == "production" {

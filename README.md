@@ -36,7 +36,8 @@ Fix wire.go in di Package Warning
    {
       "gopls": {
          "buildFlags": ["-tags=wireinject"]
-      }
+      },
+      "editor.tabSize": 4,
    }
    ```
 
