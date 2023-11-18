@@ -12,12 +12,15 @@ import (
 	"github.com/hifat/con-q/internal/app/config"
 	"github.com/hifat/con-q/internal/app/di"
 	"github.com/hifat/con-q/internal/app/routes/routeV1"
+	"github.com/hifat/con-q/internal/pkg/validity"
 )
 
 func main() {
 	cfg := config.LoadAppConfig()
 	wireHandler, cleanUp := di.InitializeAPI(cfg)
 	defer cleanUp()
+
+	validity.Register()
 
 	router := gin.Default()
 	router.Use(gin.Recovery())

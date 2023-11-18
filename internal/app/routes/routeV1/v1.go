@@ -23,4 +23,7 @@ func (r *Route) Register() {
 
 	healtzHandler := r.handler.Healtz
 	v1.GET("/healtz", healtzHandler.Get)
+
+	authHandler := r.handler.Auth
+	v1.POST("/register", authHandler.Register)
 }

@@ -1,0 +1,17 @@
+package commonConst
+
+type codeType struct {
+	DUPLICATE_RECORD      string
+	RECORD_NOTFOUND       string
+	UNAUTHORIZED          string
+	INTERNAL_SERVER_ERROR string
+	TOO_MANY_REQUEST      string
+}
+
+var Code = codeType{
+	RECORD_NOTFOUND:       "RECORD_NOTFOUND",
+	DUPLICATE_RECORD:      "DUPLICATE_RECORD",
+	UNAUTHORIZED:          "UNAUTHORIZED",
+	INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+	TOO_MANY_REQUEST:      "TOO_MANY_REQUEST",
+}

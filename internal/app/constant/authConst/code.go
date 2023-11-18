@@ -1,0 +1,17 @@
+package authConst
+
+type codeType struct {
+	INVALID_CREDENTIALS string
+	UNAUTHORIZED        string
+	BROKEN_TOKEN        string
+	NOT_FOUND_BEARER    string
+	MAX_DEVICES_LOGIN   string
+}
+
+var Code = codeType{
+	INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
+	UNAUTHORIZED:        "UNAUTHORIZED",
+	BROKEN_TOKEN:        "BROKEN_TOKEN",
+	NOT_FOUND_BEARER:    "NOT_FOUND_BEARER",
+	MAX_DEVICES_LOGIN:   "MAX_DEVICES_LOGIN",
+}
