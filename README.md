@@ -61,3 +61,8 @@ Create `uuid-ossp` extension if not exists in your postgres
 ```sql
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 ```
+
+### Generate API docs
+```
+make swag-init
+```
