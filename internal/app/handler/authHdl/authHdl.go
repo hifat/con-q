@@ -19,12 +19,12 @@ func New() AuthHandler {
 // @Tags		Auth
 // @Accept		json
 // @Produce		json
-// @Success		200 {object} authDomain.ResponseRegister
-// @Success		409 {object} response.ErrorResponse "Duplicate record"
-// @Success		422 {object} response.ErrorResponse "Form validation error"
-// @Success		500 {object} response.ErrorResponse "Internal server error"
+// @Success		200 {object} authDomain.ReqRegister
+// @Success		409 {object} errorDomain.Response "Duplicate record"
+// @Success		422 {object} errorDomain.Response "Form validation error"
+// @Success		500 {object} errorDomain.Response "Internal server error"
 // @Router		/auth/register [post]
-// @Param		Body body authDomain.RequestRegister true "Register request"
+// @Param		Body body authDomain.ReqRegister true "Register request"
 func (h *AuthHandler) Register(ctx *gin.Context) {
 	var req authDomain.ReqRegister
 	err := ctx.ShouldBind(&req)

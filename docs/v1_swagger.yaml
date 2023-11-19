@@ -1,0 +1,109 @@
+basePath: /v1
+definitions:
+  authDomain.ReqRegister:
+    properties:
+      name:
+        description: Your full name
+        example: Corn Dog
+        maxLength: 100
+        type: string
+      password:
+        description: Your password
+        example: Cq1234_
+        maxLength: 75
+        type: string
+      username:
+        description: Your username
+        example: conq
+        maxLength: 100
+        type: string
+    required:
+    - name
+    - password
+    - username
+    type: object
+  errorDomain.Error:
+    properties:
+      attribute: {}
+      code:
+        type: string
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  errorDomain.Response:
+    properties:
+      error:
+        $ref: '#/definitions/errorDomain.Error'
+    type: object
+info:
+  contact: {}
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: ConQ API
+  version: "1.0"
+paths:
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Register request
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/authDomain.ReqRegister'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/authDomain.ReqRegister'
+        "409":
+          description: Duplicate record
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "422":
+          description: Form validation error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+      summary: Register
+      tags:
+      - Auth
+  /healtz:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Register request
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/authDomain.ReqRegister'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Healt Check
+security:
+- bearer: []
+securityDefinitions:
+  bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

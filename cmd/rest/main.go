@@ -8,12 +8,26 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/di"
 	"github.com/hifat/con-q-api/internal/app/routes/routeV1"
 	"github.com/hifat/con-q-api/internal/pkg/validity"
 )
+
+func configCors() cors.Config {
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowHeaders = []string{
+		"Origin",
+		"Content-Length",
+		"Content-Type",
+		"Authorization",
+	}
+
+	return corsConfig
+}
 
 func main() {
 	cfg := config.LoadAppConfig()
