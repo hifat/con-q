@@ -1,18 +1,22 @@
 package authHdl
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
+	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
 	"github.com/hifat/con-q-api/internal/pkg/validity"
 )
 
-type AuthHandler struct{}
+type AuthHandler struct {
+	authSrv authDomain.IAuthSrv
+}
 
-func New() AuthHandler {
-	return AuthHandler{}
+func New(authSrv authDomain.IAuthSrv) AuthHandler {
+	return AuthHandler{authSrv}
 }
 
 // @Summary		Register
@@ -30,6 +34,15 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	err := ctx.ShouldBind(&req)
 	if err != nil {
 		httpResponse.FormErr(ctx, validity.Validate(err))
+		return
+	}
+
+	err = h.authSrv.Register(ctx.Request.Context(), req)
+	if err != nil {
+		log.Println(err.Error())
+		e := err.(errorDomain.Error)
+
+		ctx.JSON(e.Status, e)
 		return
 	}
 

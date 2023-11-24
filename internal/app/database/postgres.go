@@ -8,14 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewPostgresConnection(cfg config.DBConfig) (*gorm.DB, func()) {
+func NewPostgresConnection(cfg config.AppConfig) (*gorm.DB, func()) {
+	dbCfg := cfg.DB
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		cfg.Host,
-		cfg.Username,
-		cfg.Password,
-		cfg.Name,
-		cfg.Port,
+		dbCfg.Host,
+		dbCfg.Username,
+		dbCfg.Password,
+		dbCfg.Name,
+		dbCfg.Port,
 	)
 	conn, err := gorm.Open(postgres.New(postgres.Config{
 		DSN: dsn,

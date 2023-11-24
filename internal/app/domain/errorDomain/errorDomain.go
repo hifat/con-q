@@ -10,3 +10,7 @@ type Error struct {
 type Response struct {
 	Error Error `json:"error"`
 }
+
+func (e Error) Error() string {
+	return e.Message
+}
