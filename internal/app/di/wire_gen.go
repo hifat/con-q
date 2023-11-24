@@ -9,22 +9,35 @@ package di
 import (
 	"github.com/google/wire"
 	"github.com/hifat/con-q-api/internal/app/config"
+	"github.com/hifat/con-q-api/internal/app/database"
 	"github.com/hifat/con-q-api/internal/app/handler"
 	"github.com/hifat/con-q-api/internal/app/handler/authHdl"
 	"github.com/hifat/con-q-api/internal/app/handler/healtzHdl"
+	"github.com/hifat/con-q-api/internal/app/repository/authRepo"
+	"github.com/hifat/con-q-api/internal/app/repository/userRepo"
+	"github.com/hifat/con-q-api/internal/app/service/authSrv"
 )
 
 // Injectors from wire.go:
 
-func InitializeAPI(cfg *config.AppConfig) (Adapter, func()) {
+func InitializeAPI(cfg config.AppConfig) (Adapter, func()) {
 	healtzHandler := healtzHdl.New()
-	authHandler := authHdl.New()
+	db, cleanup := database.NewPostgresConnection(cfg)
+	iAuthRepo := authRepo.New(db)
+	iUserRepo := userRepo.New(db)
+	iAuthSrv := authSrv.New(iAuthRepo, iUserRepo)
+	authHandler := authHdl.New(iAuthSrv)
 	handlerHandler := handler.NewHandler(healtzHandler, authHandler)
 	adapter := NewAdapter(handlerHandler)
 	return adapter, func() {
+		cleanup()
 	}
 }
 
 // wire.go:
+
+var RepoSet = wire.NewSet(database.NewPostgresConnection, authRepo.New, userRepo.New)
+
+var ServiceSet = wire.NewSet(authSrv.New)
 
 var HandlerSet = wire.NewSet(handler.NewHandler, healtzHdl.New, authHdl.New)

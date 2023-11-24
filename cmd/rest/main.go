@@ -31,7 +31,7 @@ func configCors() cors.Config {
 
 func main() {
 	cfg := config.LoadAppConfig()
-	wireHandler, cleanUp := di.InitializeAPI(cfg)
+	wireHandler, cleanUp := di.InitializeAPI(*cfg)
 	defer cleanUp()
 
 	validity.Register()
