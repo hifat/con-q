@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 )
 
 type AppConfig struct {
-	Env EnvConfig
-	DB  DBConfig
+	Env  EnvConfig
+	DB   DBConfig
+	Auth AuthConfig
 }
 
 type EnvConfig struct {
@@ -28,15 +30,23 @@ type DBConfig struct {
 	Password string `envconfig:"DB_PASSWORD"`
 }
 
+type AuthConfig struct {
+	AccessTokenSecret    string        `envconfig:"ACCESS_TOKEN_SECRET"`
+	AccessTokenDuration  time.Duration `envconfig:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenSecret   string        `envconfig:"REFRESH_TOKEN_SECRET"`
+	RefreshTokenDuration time.Duration `envconfig:"REFRESH_TOKEN_DURATION"`
+}
+
 func (c *AppConfig) Init() {
 	envconfig.MustProcess("", &c.Env)
 	envconfig.MustProcess("", &c.DB)
+	envconfig.MustProcess("", &c.Auth)
 }
 
 func LoadAppConfig() *AppConfig {
 	_, b, _, _ := runtime.Caller(0)
 	basePath := filepath.Dir(b)
-	fmt.Println(basePath)
+
 	err := godotenv.Load(fmt.Sprintf("%v/../../../config/env/.env", basePath))
 	if err != nil {
 		err = godotenv.Load()

@@ -45,4 +45,5 @@ func (r *Route) Register() {
 	authRoute := v1.Group("auth")
 	authHandler := r.handler.Auth
 	authRoute.POST("/register", authHandler.Register)
+	authRoute.POST("/login", authHandler.Login)
 }

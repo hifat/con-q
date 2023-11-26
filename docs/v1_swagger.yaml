@@ -1,19 +1,32 @@
 basePath: /v1
 definitions:
+  authDomain.ReqLogin:
+    properties:
+      password:
+        example: Cq123456_
+        maxLength: 70
+        minLength: 8
+        type: string
+      username:
+        example: conq
+        maxLength: 100
+        type: string
+    required:
+    - password
+    - username
+    type: object
   authDomain.ReqRegister:
     properties:
       name:
-        description: Your full name
         example: Corn Dog
         maxLength: 100
         type: string
       password:
-        description: Your password
-        example: Cq1234_
-        maxLength: 75
+        example: Cq123456_
+        maxLength: 70
+        minLength: 8
         type: string
       username:
-        description: Your username
         example: conq
         maxLength: 100
         type: string
@@ -21,6 +34,15 @@ definitions:
     - name
     - password
     - username
+    type: object
+  authDomain.ResToken:
+    properties:
+      accessToken:
+        example: eyJhbGciO...
+        type: string
+      refreshToken:
+        example: eyJhbGciO...
+        type: string
     type: object
   errorDomain.Error:
     properties:
@@ -47,6 +69,39 @@ info:
   title: ConQ API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login request
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/authDomain.ReqLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/authDomain.ResToken'
+        "401":
+          description: Invalid Credentials
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "422":
+          description: Form validation error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+      summary: Login
+      tags:
+      - Auth
   /auth/register:
     post:
       consumes:
