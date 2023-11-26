@@ -46,7 +46,7 @@ func (c *AppConfig) Init() {
 func LoadAppConfig() *AppConfig {
 	_, b, _, _ := runtime.Caller(0)
 	basePath := filepath.Dir(b)
-	fmt.Println(basePath)
+
 	err := godotenv.Load(fmt.Sprintf("%v/../../../config/env/.env", basePath))
 	if err != nil {
 		err = godotenv.Load()

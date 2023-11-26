@@ -20,6 +20,57 @@ const docTemplatev1 = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Login request",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/authDomain.ReqLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/authDomain.ResToken"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid Credentials",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    },
+                    "422": {
+                        "description": "Form validation error",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "consumes": [
@@ -103,6 +154,26 @@ const docTemplatev1 = `{
         }
     },
     "definitions": {
+        "authDomain.ReqLogin": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "maxLength": 70,
+                    "minLength": 8,
+                    "example": "Cq123456_"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "example": "conq"
+                }
+            }
+        },
         "authDomain.ReqRegister": {
             "type": "object",
             "required": [
@@ -112,22 +183,33 @@ const docTemplatev1 = `{
             ],
             "properties": {
                 "name": {
-                    "description": "Your full name",
                     "type": "string",
                     "maxLength": 100,
                     "example": "Corn Dog"
                 },
                 "password": {
-                    "description": "Your password",
                     "type": "string",
-                    "maxLength": 75,
-                    "example": "Cq1234_"
+                    "maxLength": 70,
+                    "minLength": 8,
+                    "example": "Cq123456_"
                 },
                 "username": {
-                    "description": "Your username",
                     "type": "string",
                     "maxLength": 100,
                     "example": "conq"
+                }
+            }
+        },
+        "authDomain.ResToken": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string",
+                    "example": "eyJhbGciO..."
+                },
+                "refreshToken": {
+                    "type": "string",
+                    "example": "eyJhbGciO..."
                 }
             }
         },

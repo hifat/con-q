@@ -60,26 +60,40 @@ func (t TokenType) secret(cfg config.AuthConfig) (string, error) {
 	return secrets[t], nil
 }
 
-func Signed(cfg config.AppConfig, condiment string, tokenType TokenType, passport authDomain.Passport) (string, error) {
+type handler struct {
+	cfg       config.AppConfig
+	condiment string
+	passport  authDomain.Passport
+}
+
+func New(cfg config.AppConfig, condiment string, passport authDomain.Passport) *handler {
+	return &handler{
+		cfg,
+		condiment,
+		passport,
+	}
+}
+
+func (h *handler) Signed(tokenType TokenType) (string, error) {
 	subject, err := tokenType.name()
 	if err != nil {
 		return "", err
 	}
 
-	duration, err := tokenType.duration(cfg.Auth)
+	duration, err := tokenType.duration(h.cfg.Auth)
 	if err != nil {
 		return "", err
 	}
 
-	secret, err := tokenType.secret(cfg.Auth)
+	secret, err := tokenType.secret(h.cfg.Auth)
 	if err != nil {
 		return "", err
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, AuthClaims{
-		Passport: passport,
+		Passport: h.passport,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    cfg.Env.AppName,
+			Issuer:    h.cfg.Env.AppName,
 			Subject:   subject,
 			Audience:  []string{"*"},
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
@@ -88,21 +102,21 @@ func Signed(cfg config.AppConfig, condiment string, tokenType TokenType, passpor
 		},
 	})
 
-	return token.SignedString(secret + condiment)
+	return token.SignedString([]byte(secret + h.condiment))
 }
 
-func Claims(cfg config.AppConfig, condiment string, tokenType TokenType, tokenString string) (*AuthClaims, error) {
+func (h *handler) Claims(tokenType TokenType, tokenString string) (*AuthClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		secret, err := tokenType.secret(cfg.Auth)
+		secret, err := tokenType.secret(h.cfg.Auth)
 		if err != nil {
 			return nil, err
 		}
 
-		return secret + condiment, nil
+		return secret + h.condiment, nil
 	})
 	if err != nil {
 		return nil, err

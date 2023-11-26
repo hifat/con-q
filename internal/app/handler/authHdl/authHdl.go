@@ -50,3 +50,34 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 		"message": "ok",
 	})
 }
+
+// @Summary		Login
+// @Tags		Auth
+// @Accept		json
+// @Produce		json
+// @Success		200 {object} authDomain.ResToken
+// @Success		401 {object} errorDomain.Response "Invalid Credentials"
+// @Success		422 {object} errorDomain.Response "Form validation error"
+// @Success		500 {object} errorDomain.Response "Internal server error"
+// @Router		/auth/login [post]
+// @Param		Body body authDomain.ReqLogin true "Login request"
+func (h *AuthHandler) Login(ctx *gin.Context) {
+	var req authDomain.ReqLogin
+	err := ctx.ShouldBind(&req)
+	if err != nil {
+		httpResponse.FormErr(ctx, validity.Validate(err))
+		return
+	}
+
+	var res authDomain.ResToken
+	err = h.authSrv.Login(ctx.Request.Context(), &res, req)
+	if err != nil {
+		log.Println(err.Error())
+		e := err.(errorDomain.Error)
+
+		ctx.JSON(e.Status, e)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, res)
+}
