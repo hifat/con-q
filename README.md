@@ -43,6 +43,13 @@ Fix wire.go in di Package Warning
 
 ## Developing ConQ
 
+### Add ENV variables
+
+1. Add variable to `config/env/.env`
+2. Add variable to `internal/app/config/config.go`
+
+### Dependency Injection
+
 -  Use `wire` for Dependency Injection
 
    ```shell
