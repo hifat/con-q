@@ -17,9 +17,10 @@ type AppConfig struct {
 }
 
 type EnvConfig struct {
-	AppHost string `envconfig:"APP_HOST"`
-	AppName string `envconfig:"APP_NAME"`
-	AppPort string `envconfig:"APP_PORT"`
+	AppHost   string `envconfig:"APP_HOST"`
+	AppName   string `envconfig:"APP_NAME"`
+	AppPort   string `envconfig:"APP_PORT"`
+	SecretKey string `envconfig:"SECRET_KEY"`
 }
 
 type DBConfig struct {
@@ -31,10 +32,12 @@ type DBConfig struct {
 }
 
 type AuthConfig struct {
+	ApiKey               string        `envconfig:"API_KEY"`
 	AccessTokenSecret    string        `envconfig:"ACCESS_TOKEN_SECRET"`
 	AccessTokenDuration  time.Duration `envconfig:"ACCESS_TOKEN_DURATION"`
 	RefreshTokenSecret   string        `envconfig:"REFRESH_TOKEN_SECRET"`
 	RefreshTokenDuration time.Duration `envconfig:"REFRESH_TOKEN_DURATION"`
+	MAX_DEVICE           uint          `envconfig:"MAX_DEVICE"`
 }
 
 func (c *AppConfig) Init() {

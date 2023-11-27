@@ -36,6 +36,7 @@ func (s *authSrv) Register(ctx context.Context, req authDomain.ReqRegister) erro
 	if exists {
 		return ernos.HasAlreadyExists("username")
 	}
+
 	req.Password, err = helper.HashPassword(req.Password)
 	if err != nil {
 		return ernos.InternalServerError()
@@ -53,12 +54,12 @@ func (s *authSrv) Login(ctx context.Context, res *authDomain.ResToken, req authD
 	var user userDomain.User
 	err := s.userRepo.FirstByCol(ctx, &user, "username", req.Username)
 	if err != nil {
-		return ernos.Unauthorized(authConst.Msg.INVALID_CREDENTIALS)
+		return ernos.Unauthorized(authConst.Msg.INVALID_CREDENTIALS, authConst.Code.INVALID_CREDENTIALS)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return ernos.Unauthorized(authConst.Msg.INVALID_CREDENTIALS)
+		return ernos.Unauthorized(authConst.Msg.INVALID_CREDENTIALS, authConst.Code.INVALID_CREDENTIALS)
 	}
 
 	cfg := config.LoadAppConfig()
@@ -79,6 +80,7 @@ func (s *authSrv) Login(ctx context.Context, res *authDomain.ResToken, req authD
 
 	refreshToken, err := newToken.Signed(token.REFRESH)
 	if err != nil {
+		log.Println(err.Error())
 		return ernos.InternalServerError()
 	}
 

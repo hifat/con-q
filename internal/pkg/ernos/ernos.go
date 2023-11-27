@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/hifat/con-q-api/internal/app/constant/authConst"
 	"github.com/hifat/con-q-api/internal/app/constant/commonConst"
 	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
 )
@@ -47,15 +48,20 @@ func Forbidden(value string) error {
 }
 
 func Unauthorized(value ...string) error {
-	msg := commonConst.Code.UNAUTHORIZED
+	msg := authConst.Msg.UNAUTHORIZED
 	if len(value) > 0 {
 		msg = strings.Join(value, "")
+	}
+
+	code := authConst.Code.UNAUTHORIZED
+	if len(value) > 0 {
+		code = strings.Join(value[1:], "")
 	}
 
 	return errorDomain.Error{
 		Status:  http.StatusUnauthorized,
 		Message: msg,
-		Code:    commonConst.Code.UNAUTHORIZED,
+		Code:    code,
 	}
 }
 
