@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/config"
-	"github.com/hifat/con-q-api/internal/app/constant/authConst"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
 	"github.com/hifat/con-q-api/internal/pkg/ernos"
@@ -54,12 +53,12 @@ func (s *authSrv) Login(ctx context.Context, res *authDomain.ResToken, req authD
 	var user userDomain.User
 	err := s.userRepo.FirstByCol(ctx, &user, "username", req.Username)
 	if err != nil {
-		return ernos.Unauthorized(authConst.Msg.INVALID_CREDENTIALS, authConst.Code.INVALID_CREDENTIALS)
+		return ernos.InvalidCredentials()
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return ernos.Unauthorized(authConst.Msg.INVALID_CREDENTIALS, authConst.Code.INVALID_CREDENTIALS)
+		return ernos.InvalidCredentials()
 	}
 
 	cfg := config.LoadAppConfig()
