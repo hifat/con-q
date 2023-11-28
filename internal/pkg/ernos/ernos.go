@@ -9,10 +9,10 @@ import (
 	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
 )
 
-func HasAlreadyExists(value ...string) error {
+func HasAlreadyExists(fields ...string) error {
 	msg := commonConst.Code.DUPLICATE_RECORD
-	if len(value) > 0 {
-		msg = strings.Join(value, "") + " has already exists"
+	if len(fields) > 0 {
+		msg = strings.Join(fields, "") + " has already exists"
 	}
 
 	return errorDomain.Error{
@@ -22,10 +22,10 @@ func HasAlreadyExists(value ...string) error {
 	}
 }
 
-func NotFound(value ...string) error {
-	msg := commonConst.Code.RECORD_NOTFOUND
-	if len(value) > 0 {
-		msg = strings.Join(value, "") + " not found"
+func RecordNotFound(messages ...string) error {
+	msg := commonConst.Msg.RECORD_NOTFOUND
+	if len(messages) > 0 {
+		msg = strings.Join(messages, "") + " not found"
 	}
 
 	return errorDomain.Error{
@@ -35,10 +35,10 @@ func NotFound(value ...string) error {
 	}
 }
 
-func Forbidden(value string) error {
+func Forbidden(messages string) error {
 	msg := http.StatusText(http.StatusForbidden)
-	if value != "" {
-		msg = value
+	if messages != "" {
+		msg = messages
 	}
 
 	return errorDomain.Error{
@@ -47,28 +47,36 @@ func Forbidden(value string) error {
 	}
 }
 
-func Unauthorized(value ...string) error {
+func Unauthorized(messages ...string) error {
 	msg := authConst.Msg.UNAUTHORIZED
-	if len(value) > 0 {
-		msg = strings.Join(value, "")
-	}
-
-	code := authConst.Code.UNAUTHORIZED
-	if len(value) > 0 {
-		code = strings.Join(value[1:], "")
+	if len(messages) > 0 {
+		msg = strings.Join(messages, "")
 	}
 
 	return errorDomain.Error{
 		Status:  http.StatusUnauthorized,
 		Message: msg,
-		Code:    code,
+		Code:    authConst.Code.UNAUTHORIZED,
 	}
 }
 
-func InternalServerError(value ...string) error {
+func InvalidCredentials(messages ...string) error {
+	msg := authConst.Msg.INVALID_CREDENTIALS
+	if len(messages) > 0 {
+		msg = strings.Join(messages, "")
+	}
+
+	return errorDomain.Error{
+		Status:  http.StatusUnauthorized,
+		Message: msg,
+		Code:    authConst.Code.INVALID_CREDENTIALS,
+	}
+}
+
+func InternalServerError(messages ...string) error {
 	msg := commonConst.Code.INTERNAL_SERVER_ERROR
-	if len(value) > 0 {
-		msg = strings.Join(value, "")
+	if len(messages) > 0 {
+		msg = strings.Join(messages, "")
 	}
 
 	return errorDomain.Error{
@@ -84,7 +92,7 @@ func Other(e errorDomain.Error) error {
 
 func Detect(err error) error {
 	set := map[any]error{
-		commonConst.Msg.RECORD_NOTFOUND: NotFound(),
+		commonConst.Msg.RECORD_NOTFOUND: RecordNotFound(),
 	}
 
 	if _, ok := set[err.Error()]; !ok {
