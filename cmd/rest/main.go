@@ -14,6 +14,7 @@ import (
 	"github.com/hifat/con-q-api/internal/app/di"
 	"github.com/hifat/con-q-api/internal/app/routes/routeV1"
 	"github.com/hifat/con-q-api/internal/pkg/validity"
+	"github.com/hifat/con-q-api/internal/pkg/zlog"
 )
 
 func configCors() cors.Config {
@@ -31,6 +32,11 @@ func configCors() cors.Config {
 
 func main() {
 	cfg := config.LoadAppConfig()
+
+	if cfg.Env.AppMode == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	wireHandler, cleanUp := di.InitializeAPI(*cfg)
 	defer cleanUp()
 
@@ -69,6 +75,6 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(timeOutctx); err != nil {
-		log.Println(err)
+		zlog.Error(err)
 	}
 }

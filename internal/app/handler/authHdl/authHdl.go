@@ -1,22 +1,24 @@
 package authHdl
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
-	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
 	"github.com/hifat/con-q-api/internal/pkg/validity"
+	"github.com/hifat/con-q-api/internal/pkg/zlog"
 )
 
 type AuthHandler struct {
+	cfg config.AppConfig
+
 	authSrv authDomain.IAuthSrv
 }
 
-func New(authSrv authDomain.IAuthSrv) AuthHandler {
-	return AuthHandler{authSrv}
+func New(cfg config.AppConfig, authSrv authDomain.IAuthSrv) AuthHandler {
+	return AuthHandler{cfg, authSrv}
 }
 
 // @Summary		Register
@@ -33,16 +35,20 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	var req authDomain.ReqRegister
 	err := ctx.ShouldBind(&req)
 	if err != nil {
-		httpResponse.FormErr(ctx, validity.Validate(err))
+		validate, err := validity.Validate(err)
+		if err != nil {
+			zlog.Error(err)
+			httpResponse.Error(ctx, err)
+			return
+		}
+
+		httpResponse.FormErr(ctx, h.cfg.Env.AppMode, validate)
 		return
 	}
 
 	err = h.authSrv.Register(ctx.Request.Context(), req)
 	if err != nil {
-		log.Println(err.Error())
-		e := err.(errorDomain.Error)
-
-		ctx.JSON(e.Status, e)
+		httpResponse.Error(ctx, err)
 		return
 	}
 
@@ -65,17 +71,21 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 	var req authDomain.ReqLogin
 	err := ctx.ShouldBind(&req)
 	if err != nil {
-		httpResponse.FormErr(ctx, validity.Validate(err))
+		validate, err := validity.Validate(err)
+		if err != nil {
+			zlog.Error(err)
+			httpResponse.Error(ctx, validate)
+			return
+		}
+
+		httpResponse.FormErr(ctx, h.cfg.Env.AppMode, validate)
 		return
 	}
 
 	var res authDomain.ResToken
 	err = h.authSrv.Login(ctx.Request.Context(), &res, req)
 	if err != nil {
-		log.Println(err.Error())
-		e := err.(errorDomain.Error)
-
-		ctx.JSON(e.Status, e)
+		httpResponse.Error(ctx, err)
 		return
 	}
 

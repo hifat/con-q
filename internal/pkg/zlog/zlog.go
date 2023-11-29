@@ -20,12 +20,20 @@ func init() {
 	}
 }
 
+func Skip(skip int) *zap.Logger {
+	return log.WithOptions(zap.AddCallerSkip(skip))
+}
+
 func Info(message string, fields ...zap.Field) {
 	log.Info(message, fields...)
 }
 
 func Debug(message string, fields ...zap.Field) {
 	log.Debug(message, fields...)
+}
+
+func Warn(message string, fields ...zap.Field) {
+	log.Warn(message, fields...)
 }
 
 func Error(message interface{}, fields ...zap.Field) {
