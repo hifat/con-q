@@ -1,10 +1,6 @@
 package validity
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
-	"os"
 	"reflect"
 	"strings"
 
@@ -37,32 +33,15 @@ func Register() {
 	}
 }
 
-func Validate(err error) validator.ValidationErrorsTranslations {
+func Validate(err error) (*validator.ValidationErrorsTranslations, error) {
 	if _, ok := err.(validator.ValidationErrors); !ok {
-		log.Println(err.Error())
-		return map[string]string{
-			"message": "unable to validate",
-		}
+		return nil, err
 	}
 
-	objErr := make(map[string]string)
+	objErr := make(validator.ValidationErrorsTranslations)
 	for _, e := range err.(validator.ValidationErrors) {
 		objErr[e.Field()] = e.Translate(Trans)
 	}
 
-	if os.Getenv("APP_MODE") == "production" {
-		jsonBytes, err := json.MarshalIndent(objErr, "", "  ")
-		if err != nil {
-			return map[string]string{
-				"message": "validator error marshalling to JSON",
-			}
-		}
-
-		log.Println(string(jsonBytes))
-		return map[string]string{
-			"message": http.StatusText(http.StatusUnprocessableEntity),
-		}
-	}
-
-	return objErr
+	return &objErr, nil
 }

@@ -25,8 +25,8 @@ func InitializeAPI(cfg config.AppConfig) (Adapter, func()) {
 	db, cleanup := database.NewPostgresConnection(cfg)
 	iAuthRepo := authRepo.New(db)
 	iUserRepo := userRepo.New(db)
-	iAuthSrv := authSrv.New(iAuthRepo, iUserRepo)
-	authHandler := authHdl.New(iAuthSrv)
+	iAuthSrv := authSrv.New(cfg, iAuthRepo, iUserRepo)
+	authHandler := authHdl.New(cfg, iAuthSrv)
 	handlerHandler := handler.NewHandler(healtzHandler, authHandler)
 	adapter := NewAdapter(handlerHandler)
 	return adapter, func() {

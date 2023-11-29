@@ -18,12 +18,14 @@ import (
 // Check max device
 
 type authSrv struct {
+	cfg config.AppConfig
+
 	authRepo authDomain.IAuthRepo
 	userRepo userDomain.IUserRepo
 }
 
-func New(authRepo authDomain.IAuthRepo, userRepo userDomain.IUserRepo) authDomain.IAuthSrv {
-	return &authSrv{authRepo, userRepo}
+func New(cfg config.AppConfig, authRepo authDomain.IAuthRepo, userRepo userDomain.IUserRepo) authDomain.IAuthSrv {
+	return &authSrv{cfg, authRepo, userRepo}
 }
 
 func (s *authSrv) Register(ctx context.Context, req authDomain.ReqRegister) error {
@@ -61,7 +63,6 @@ func (s *authSrv) Login(ctx context.Context, res *authDomain.ResToken, req authD
 		return ernos.InvalidCredentials()
 	}
 
-	cfg := config.LoadAppConfig()
 	claims := &authDomain.Passport{
 		User: userDomain.User{
 			Username: user.Username,
@@ -69,7 +70,7 @@ func (s *authSrv) Login(ctx context.Context, res *authDomain.ResToken, req authD
 		},
 	}
 
-	newToken := token.New(*cfg, user.Password, *claims)
+	newToken := token.New(s.cfg, user.Password, *claims)
 
 	accessToken, err := newToken.Signed(token.ACCESS)
 	if err != nil {

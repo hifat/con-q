@@ -17,6 +17,7 @@ type AppConfig struct {
 }
 
 type EnvConfig struct {
+	AppMode   string `envconfig:"APP_MODE"`
 	AppHost   string `envconfig:"APP_HOST"`
 	AppName   string `envconfig:"APP_NAME"`
 	AppPort   string `envconfig:"APP_PORT"`
