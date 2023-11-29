@@ -2,7 +2,6 @@ package authSrv
 
 import (
 	"context"
-	"log"
 
 	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/config"
@@ -11,6 +10,7 @@ import (
 	"github.com/hifat/con-q-api/internal/pkg/ernos"
 	"github.com/hifat/con-q-api/internal/pkg/helper"
 	"github.com/hifat/con-q-api/internal/pkg/token"
+	"github.com/hifat/con-q-api/internal/pkg/zlog"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -31,6 +31,7 @@ func New(cfg config.AppConfig, authRepo authDomain.IAuthRepo, userRepo userDomai
 func (s *authSrv) Register(ctx context.Context, req authDomain.ReqRegister) error {
 	exists, err := s.userRepo.Exists("username", req.Username)
 	if err != nil {
+		zlog.Error(err)
 		return ernos.InternalServerError()
 	}
 
@@ -40,11 +41,13 @@ func (s *authSrv) Register(ctx context.Context, req authDomain.ReqRegister) erro
 
 	req.Password, err = helper.HashPassword(req.Password)
 	if err != nil {
+		zlog.Error(err)
 		return ernos.InternalServerError()
 	}
 
 	err = s.authRepo.Register(ctx, req)
 	if err != nil {
+		zlog.Error(err)
 		return ernos.InternalServerError()
 	}
 
@@ -74,13 +77,13 @@ func (s *authSrv) Login(ctx context.Context, res *authDomain.ResToken, req authD
 
 	accessToken, err := newToken.Signed(token.ACCESS)
 	if err != nil {
-		log.Println(err.Error())
+		zlog.Error(err)
 		return ernos.InternalServerError()
 	}
 
 	refreshToken, err := newToken.Signed(token.REFRESH)
 	if err != nil {
-		log.Println(err.Error())
+		zlog.Error(err)
 		return ernos.InternalServerError()
 	}
 
