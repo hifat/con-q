@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
+	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
 	"github.com/hifat/con-q-api/internal/pkg/validity"
 	"github.com/hifat/con-q-api/internal/pkg/zlog"
@@ -82,12 +83,14 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	var res authDomain.ResToken
-	err = h.authSrv.Login(ctx.Request.Context(), &res, req)
+	res, err := h.authSrv.Login(ctx.Request.Context(), req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, res)
+	res = nil
+	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
+		Item: res,
+	})
 }

@@ -46,7 +46,10 @@ definitions:
     type: object
   errorDomain.Error:
     properties:
-      attribute: {}
+      attribute:
+        additionalProperties:
+          type: string
+        type: object
       code:
         type: string
       message:
