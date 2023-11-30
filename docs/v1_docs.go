@@ -216,7 +216,12 @@ const docTemplatev1 = `{
         "errorDomain.Error": {
             "type": "object",
             "properties": {
-                "attribute": {},
+                "attribute": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
                 "code": {
                     "type": "string"
                 },

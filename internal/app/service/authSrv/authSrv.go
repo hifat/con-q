@@ -54,16 +54,16 @@ func (s *authSrv) Register(ctx context.Context, req authDomain.ReqRegister) erro
 	return nil
 }
 
-func (s *authSrv) Login(ctx context.Context, res *authDomain.ResToken, req authDomain.ReqLogin) error {
+func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *authDomain.ResToken, err error) {
 	var user userDomain.User
-	err := s.userRepo.FirstByCol(ctx, &user, "username", req.Username)
+	err = s.userRepo.FirstByCol(ctx, &user, "username", req.Username)
 	if err != nil {
-		return ernos.InvalidCredentials()
+		return nil, ernos.InvalidCredentials()
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return ernos.InvalidCredentials()
+		return nil, ernos.InvalidCredentials()
 	}
 
 	claims := &authDomain.Passport{
@@ -78,21 +78,21 @@ func (s *authSrv) Login(ctx context.Context, res *authDomain.ResToken, req authD
 	accessToken, err := newToken.Signed(token.ACCESS)
 	if err != nil {
 		zlog.Error(err)
-		return ernos.InternalServerError()
+		return nil, ernos.InternalServerError()
 	}
 
 	refreshToken, err := newToken.Signed(token.REFRESH)
 	if err != nil {
 		zlog.Error(err)
-		return ernos.InternalServerError()
+		return nil, ernos.InternalServerError()
 	}
 
-	*res = authDomain.ResToken{
+	res = &authDomain.ResToken{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}
 
-	return nil
+	return res, nil
 }
 
 func (s *authSrv) Logout(ctx context.Context, tokenID uuid.UUID) error {

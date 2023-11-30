@@ -13,7 +13,7 @@ type IAuthRepo interface {
 
 type IAuthSrv interface {
 	Register(ctx context.Context, req ReqRegister) error
-	Login(ctx context.Context, res *ResToken, req ReqLogin) error
+	Login(ctx context.Context, req ReqLogin) (*ResToken, error)
 	Logout(ctx context.Context, tokenID uuid.UUID) error
 }
 
