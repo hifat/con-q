@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 )
@@ -62,37 +63,40 @@ func (t TokenType) secret(cfg config.AuthConfig) (string, error) {
 
 type handler struct {
 	cfg       config.AppConfig
+	tokenID   uuid.UUID
 	condiment string
 	passport  authDomain.Passport
 }
 
-func New(cfg config.AppConfig, condiment string, passport authDomain.Passport) *handler {
+func New(cfg config.AppConfig, tokenID uuid.UUID, condiment string, passport authDomain.Passport) *handler {
 	return &handler{
 		cfg,
+		tokenID,
 		condiment,
 		passport,
 	}
 }
 
-func (h *handler) Signed(tokenType TokenType) (string, error) {
+func (h *handler) Signed(tokenType TokenType) (*AuthClaims, string, error) {
 	subject, err := tokenType.name()
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
 	duration, err := tokenType.duration(h.cfg.Auth)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
 	secret, err := tokenType.secret(h.cfg.Auth)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, AuthClaims{
+	authClaims := AuthClaims{
 		Passport: h.passport,
 		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        h.tokenID.String(),
 			Issuer:    h.cfg.Env.AppName,
 			Subject:   subject,
 			Audience:  []string{"*"},
@@ -100,9 +104,12 @@ func (h *handler) Signed(tokenType TokenType) (string, error) {
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
-	})
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, authClaims)
 
-	return token.SignedString([]byte(secret + h.condiment))
+	sined, err := token.SignedString([]byte(secret + h.condiment))
+
+	return &authClaims, sined, err
 }
 
 func (h *handler) Claims(tokenType TokenType, tokenString string) (*AuthClaims, error) {

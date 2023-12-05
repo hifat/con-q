@@ -83,13 +83,15 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
+	req.Agent = ctx.Request.UserAgent()
+	req.ClientIP = ctx.ClientIP()
+
 	res, err := h.authSrv.Login(ctx.Request.Context(), req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
 	}
 
-	res = nil
 	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
 		Item: res,
 	})
