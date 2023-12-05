@@ -38,7 +38,7 @@ type AuthConfig struct {
 	AccessTokenDuration  time.Duration `envconfig:"ACCESS_TOKEN_DURATION"`
 	RefreshTokenSecret   string        `envconfig:"REFRESH_TOKEN_SECRET"`
 	RefreshTokenDuration time.Duration `envconfig:"REFRESH_TOKEN_DURATION"`
-	MAX_DEVICE           uint          `envconfig:"MAX_DEVICE"`
+	MaxDevice            uint          `envconfig:"MAX_DEVICE"`
 }
 
 func (c *AppConfig) Init() {
