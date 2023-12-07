@@ -20,6 +20,7 @@ type IAuthSrv interface {
 	Register(ctx context.Context, req ReqRegister) error
 	Login(ctx context.Context, req ReqLogin) (*ResToken, error)
 	Logout(ctx context.Context, tokenID uuid.UUID) error
+	RefreshToken(ctx context.Context, passport Passport, req ReqRefreshToken) (*ResToken, error)
 }
 
 type ReqRegister struct {
@@ -39,8 +40,8 @@ type ReqAuth struct {
 	ID        uuid.UUID
 	Agent     string
 	ClientIP  string
-	UserID    uuid.UUID
 	ExpiresAt time.Time
+	UserID    uuid.UUID
 }
 
 type Passport struct {
@@ -48,7 +49,12 @@ type Passport struct {
 }
 
 type ResToken struct {
-	ID           uuid.UUID `json:"id" example:"594d7791-d4fc..."`
-	AccessToken  string    `json:"accessToken" example:"eyJhbGciO..."`
-	RefreshToken string    `json:"refreshToken" example:"eyJhbGciO..."`
+	AccessToken  string `json:"accessToken" example:"eyJhbGciO..."`
+	RefreshToken string `json:"refreshToken" example:"eyJhbGciO..."`
+}
+
+type ReqRefreshToken struct {
+	RefreshToken string `json:"refreshToken" example:"eyJhbGciO..."`
+	Agent        string `json:"-"`
+	ClientIP     string `json:"-"`
 }

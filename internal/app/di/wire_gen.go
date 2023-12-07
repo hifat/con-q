@@ -13,9 +13,12 @@ import (
 	"github.com/hifat/con-q-api/internal/app/handler"
 	"github.com/hifat/con-q-api/internal/app/handler/authHdl"
 	"github.com/hifat/con-q-api/internal/app/handler/healtzHdl"
+	"github.com/hifat/con-q-api/internal/app/middleware"
+	"github.com/hifat/con-q-api/internal/app/middleware/authMdl"
 	"github.com/hifat/con-q-api/internal/app/repository/authRepo"
 	"github.com/hifat/con-q-api/internal/app/repository/userRepo"
 	"github.com/hifat/con-q-api/internal/app/service/authSrv"
+	"github.com/hifat/con-q-api/internal/app/service/middlewareSrv"
 )
 
 // Injectors from wire.go:
@@ -27,8 +30,11 @@ func InitializeAPI(cfg config.AppConfig) (Adapter, func()) {
 	iUserRepo := userRepo.New(db)
 	iAuthSrv := authSrv.New(cfg, iAuthRepo, iUserRepo)
 	authHandler := authHdl.New(cfg, iAuthSrv)
-	handlerHandler := handler.NewHandler(healtzHandler, authHandler)
-	adapter := NewAdapter(handlerHandler)
+	handlerHandler := handler.New(healtzHandler, authHandler)
+	iMiddlewareService := middlewareSrv.New(cfg, iAuthRepo, iUserRepo)
+	authMiddleware := authMdl.New(cfg, iMiddlewareService)
+	middlewareMiddleware := middleware.New(authMiddleware)
+	adapter := NewAdapter(handlerHandler, middlewareMiddleware)
 	return adapter, func() {
 		cleanup()
 	}
@@ -38,6 +44,6 @@ func InitializeAPI(cfg config.AppConfig) (Adapter, func()) {
 
 var RepoSet = wire.NewSet(database.NewPostgresConnection, authRepo.New, userRepo.New)
 
-var ServiceSet = wire.NewSet(authSrv.New)
+var ServiceSet = wire.NewSet(authSrv.New, middlewareSrv.New)
 
-var HandlerSet = wire.NewSet(handler.NewHandler, healtzHdl.New, authHdl.New)
+var HandlerSet = wire.NewSet(handler.New, middleware.New, authMdl.New, healtzHdl.New, authHdl.New)

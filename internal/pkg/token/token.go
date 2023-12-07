@@ -13,6 +13,11 @@ import (
 
 type TokenType int64
 
+var (
+	ErrInvalidToken = errors.New("invalid token")
+	ErrTokenExpired = errors.New("token expired")
+)
+
 const (
 	REFRESH TokenType = iota
 	ACCESS
@@ -62,17 +67,15 @@ func (t TokenType) secret(cfg config.AuthConfig) (string, error) {
 }
 
 type handler struct {
-	cfg       config.AppConfig
-	tokenID   uuid.UUID
-	condiment string
-	passport  authDomain.Passport
+	cfg      config.AppConfig
+	tokenID  uuid.UUID
+	passport authDomain.Passport
 }
 
-func New(cfg config.AppConfig, tokenID uuid.UUID, condiment string, passport authDomain.Passport) *handler {
+func New(cfg config.AppConfig, tokenID uuid.UUID, passport authDomain.Passport) *handler {
 	return &handler{
 		cfg,
 		tokenID,
-		condiment,
 		passport,
 	}
 }
@@ -105,28 +108,36 @@ func (h *handler) Signed(tokenType TokenType) (*AuthClaims, string, error) {
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, authClaims)
 
-	sined, err := token.SignedString([]byte(secret + h.condiment))
+	sined, err := token.SignedString([]byte(secret))
 
 	return &authClaims, sined, err
 }
 
-func (h *handler) Claims(tokenType TokenType, tokenString string) (*AuthClaims, error) {
+func Claims(cfg config.AuthConfig, tokenType TokenType, tokenString string) (*AuthClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		secret, err := tokenType.secret(h.cfg.Auth)
+		secret, err := tokenType.secret(cfg)
 		if err != nil {
 			return nil, err
 		}
 
-		return secret + h.condiment, nil
+		return secret, nil
 	})
 	if err != nil {
-		return nil, err
+		switch {
+		case errors.Is(err, jwt.ErrTokenMalformed), errors.Is(err, jwt.ErrTokenSignatureInvalid), errors.Is(err, jwt.ErrTokenNotValidYet):
+			return nil, ErrInvalidToken
+		case errors.Is(err, jwt.ErrTokenExpired):
+			return nil, ErrTokenExpired
+		default:
+			return nil, err
+		}
 	}
 
 	if claims, ok := token.Claims.(AuthClaims); ok {

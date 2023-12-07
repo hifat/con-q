@@ -2,6 +2,7 @@ package routeV1
 
 import (
 	"github.com/hifat/con-q-api/internal/app/handler"
+	"github.com/hifat/con-q-api/internal/app/middleware"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/hifat/con-q-api/docs"
@@ -10,13 +11,15 @@ import (
 )
 
 type Route struct {
-	router  *gin.RouterGroup
-	handler handler.Handler
+	router     *gin.RouterGroup
+	middleware middleware.Middleware
+	handler    handler.Handler
 }
 
-func New(router *gin.RouterGroup, handler handler.Handler) *Route {
+func New(router *gin.RouterGroup, middleware middleware.Middleware, handler handler.Handler) *Route {
 	return &Route{
 		router,
+		middleware,
 		handler,
 	}
 }
@@ -42,8 +45,11 @@ func (r *Route) Register() {
 	healtzHandler := r.handler.Healtz
 	v1.GET("/healtz", healtzHandler.Get)
 
+	authMiddleware := r.middleware.Auth
+
 	authRoute := v1.Group("auth")
 	authHandler := r.handler.Auth
 	authRoute.POST("/register", authHandler.Register)
 	authRoute.POST("/login", authHandler.Login)
+	authRoute.POST("/refresh-token", authMiddleware.AuthGuard(), authHandler.RefreshToken)
 }

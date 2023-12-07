@@ -52,6 +52,6 @@ func (r *authRepo) Delete(ctx context.Context, authID uuid.UUID) error {
 
 func (r *authRepo) RemoveTokenExpires(ctx context.Context, userID uuid.UUID) error {
 	return r.db.Where("user_id = ?", userID).
-		Where("expires_at >= ", time.Now().Format(time.RFC3339)).
+		Where("expires_at <= ?", time.Now().Format(time.RFC3339)).
 		Delete(&model.Auth{}).Error
 }

@@ -46,10 +46,7 @@ definitions:
     type: object
   errorDomain.Error:
     properties:
-      attribute:
-        additionalProperties:
-          type: string
-        type: object
+      attribute: {}
       code:
         type: string
       message:
@@ -103,6 +100,39 @@ paths:
           schema:
             $ref: '#/definitions/errorDomain.Response'
       summary: Login
+      tags:
+      - Auth
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login request
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/authDomain.ReqLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/authDomain.ResToken'
+        "401":
+          description: Invalid Credentials
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "422":
+          description: Form validation error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+      summary: Refresh Token
       tags:
       - Auth
   /auth/register:

@@ -71,6 +71,57 @@ const docTemplatev1 = `{
                 }
             }
         },
+        "/auth/refresh-token": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh Token",
+                "parameters": [
+                    {
+                        "description": "Login request",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/authDomain.ReqLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/authDomain.ResToken"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid Credentials",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    },
+                    "422": {
+                        "description": "Form validation error",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "consumes": [
@@ -216,12 +267,7 @@ const docTemplatev1 = `{
         "errorDomain.Error": {
             "type": "object",
             "properties": {
-                "attribute": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
+                "attribute": {},
                 "code": {
                     "type": "string"
                 },
