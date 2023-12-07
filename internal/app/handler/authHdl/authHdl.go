@@ -83,13 +83,54 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
+	req.Agent = ctx.Request.UserAgent()
+	req.ClientIP = ctx.ClientIP()
+
 	res, err := h.authSrv.Login(ctx.Request.Context(), req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
 	}
 
-	res = nil
+	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
+		Item: res,
+	})
+}
+
+// @Summary		Refresh Token
+// @Tags		Auth
+// @Accept		json
+// @Produce		json
+// @Success		200 {object} authDomain.ResToken
+// @Success		401 {object} errorDomain.Response "Invalid Credentials"
+// @Success		422 {object} errorDomain.Response "Form validation error"
+// @Success		500 {object} errorDomain.Response "Internal server error"
+// @Router		/auth/refresh-token [post]
+// @Param		Body body authDomain.ReqLogin true "Login request"
+func (h *AuthHandler) RefreshToken(ctx *gin.Context) {
+	var req authDomain.ReqLogin
+	err := ctx.ShouldBind(&req)
+	if err != nil {
+		validate, err := validity.Validate(err)
+		if err != nil {
+			zlog.Error(err)
+			httpResponse.Error(ctx, validate)
+			return
+		}
+
+		httpResponse.FormErr(ctx, h.cfg.Env.AppMode, validate)
+		return
+	}
+
+	req.Agent = ctx.Request.UserAgent()
+	req.ClientIP = ctx.ClientIP()
+
+	res, err := h.authSrv.Login(ctx.Request.Context(), req)
+	if err != nil {
+		httpResponse.Error(ctx, err)
+		return
+	}
+
 	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
 		Item: res,
 	})

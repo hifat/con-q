@@ -6,6 +6,6 @@ import (
 )
 
 type AuthClaims struct {
-	authDomain.Passport
+	Passport authDomain.Passport
 	jwt.RegisteredClaims
 }

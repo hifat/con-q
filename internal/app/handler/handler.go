@@ -10,7 +10,7 @@ type Handler struct {
 	Auth   authHdl.AuthHandler
 }
 
-func NewHandler(HealtzHandler healtzHdl.HealtzHandler, AuthHandler authHdl.AuthHandler) Handler {
+func New(HealtzHandler healtzHdl.HealtzHandler, AuthHandler authHdl.AuthHandler) Handler {
 	return Handler{
 		Healtz: HealtzHandler,
 		Auth:   AuthHandler,

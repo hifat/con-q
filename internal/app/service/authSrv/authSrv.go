@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/config"
+	"github.com/hifat/con-q-api/internal/app/constant/commonConst"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
 	"github.com/hifat/con-q-api/internal/pkg/ernos"
@@ -13,9 +14,6 @@ import (
 	"github.com/hifat/con-q-api/internal/pkg/zlog"
 	"golang.org/x/crypto/bcrypt"
 )
-
-// When user login remove token that expired
-// Check max device
 
 type authSrv struct {
 	cfg config.AppConfig
@@ -58,7 +56,12 @@ func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *auth
 	var user userDomain.User
 	err = s.userRepo.FirstByCol(ctx, &user, "username", req.Username)
 	if err != nil {
-		return nil, ernos.InvalidCredentials()
+		if err.Error() == commonConst.Msg.RECORD_NOTFOUND {
+			zlog.Error(err)
+			return nil, ernos.InvalidCredentials()
+		}
+
+		return nil, ernos.InternalServerError()
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
@@ -68,33 +71,88 @@ func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *auth
 
 	claims := &authDomain.Passport{
 		User: userDomain.User{
+			ID:       user.ID,
 			Username: user.Username,
 			Name:     user.Name,
 		},
 	}
 
-	newToken := token.New(s.cfg, user.Password, *claims)
-
-	accessToken, err := newToken.Signed(token.ACCESS)
+	err = s.authRepo.RemoveTokenExpires(ctx, user.ID)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 
-	refreshToken, err := newToken.Signed(token.REFRESH)
+	tokenID := uuid.New()
+	res, exp, err := s.generateToken(tokenID, *claims)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 
-	res = &authDomain.ResToken{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+	err = s.authRepo.Create(ctx, authDomain.ReqAuth{
+		ID:        tokenID,
+		Agent:     req.Agent,
+		ClientIP:  req.ClientIP,
+		UserID:    user.ID,
+		ExpiresAt: exp.Refresh,
+	})
+	if err != nil {
+		zlog.Error(err)
+		return nil, ernos.InternalServerError()
 	}
 
 	return res, nil
 }
 
 func (s *authSrv) Logout(ctx context.Context, tokenID uuid.UUID) error {
-	return nil
+	return s.authRepo.Delete(ctx, tokenID)
+}
+
+func (s *authSrv) RefreshToken(ctx context.Context, passport authDomain.Passport, req authDomain.ReqRefreshToken) (*authDomain.ResToken, error) {
+	var user userDomain.User
+	err := s.userRepo.FirstByCol(ctx, &user, "username", passport.Username)
+	if err != nil {
+		if err.Error() == commonConst.Msg.RECORD_NOTFOUND {
+			zlog.Error(err)
+			return nil, ernos.InternalServerError()
+		}
+
+		return nil, ernos.InvalidCredentials()
+	}
+
+	claims, err := token.Claims(s.cfg.Auth, token.REFRESH, req.RefreshToken)
+	if err != nil {
+		zlog.Error(err)
+		return nil, ernos.InternalServerError()
+	}
+
+	claimsID, err := uuid.Parse(claims.ID)
+	if err != nil {
+		zlog.Error(err)
+		return nil, ernos.InternalServerError()
+	}
+
+	err = s.authRepo.Delete(ctx, claimsID)
+	if err != nil {
+		zlog.Error(err)
+		return nil, ernos.InternalServerError()
+	}
+
+	tokenID := uuid.New()
+	res, exp, err := s.generateToken(tokenID, passport)
+
+	err = s.authRepo.Create(ctx, authDomain.ReqAuth{
+		ID:        claimsID,
+		Agent:     req.Agent,
+		ClientIP:  req.ClientIP,
+		UserID:    user.ID,
+		ExpiresAt: exp.Refresh,
+	})
+	if err != nil {
+		zlog.Error(err)
+		return nil, ernos.InternalServerError()
+	}
+
+	return res, nil
 }

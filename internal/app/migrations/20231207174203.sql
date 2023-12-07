@@ -19,6 +19,7 @@ CREATE TABLE "public"."auths" (
   "token" text NULL,
   "agent" character varying(100) NULL,
   "client_ip" text NULL,
+  "expires_at" timestamptz NULL,
   "user_id" uuid NULL,
   "created_at" timestamptz NULL,
   "updated_at" timestamptz NULL,

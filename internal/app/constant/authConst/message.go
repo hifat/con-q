@@ -7,6 +7,8 @@ type msgType struct {
 	NOT_FOUND_BEARER        string
 	BROKEN_TOKEN            string
 	MAX_DEVICES_LOGIN       string
+	INVALID_TOKEN           string
+	TOKEN_EXPIRED           string
 }
 
 var Msg = msgType{
@@ -16,4 +18,6 @@ var Msg = msgType{
 	NOT_FOUND_BEARER:        "could not find bearer token in authorization header",
 	BROKEN_TOKEN:            "the token is broken",
 	MAX_DEVICES_LOGIN:       "maximum devices limit reached. please log out from one of your other devices before attempting to log in again",
+	INVALID_TOKEN:           "invalid token",
+	TOKEN_EXPIRED:           "token expired",
 }

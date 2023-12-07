@@ -6,11 +6,17 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 )
 
 type TokenType int64
+
+var (
+	ErrInvalidToken = errors.New("invalid token")
+	ErrTokenExpired = errors.New("token expired")
+)
 
 const (
 	REFRESH TokenType = iota
@@ -61,38 +67,39 @@ func (t TokenType) secret(cfg config.AuthConfig) (string, error) {
 }
 
 type handler struct {
-	cfg       config.AppConfig
-	condiment string
-	passport  authDomain.Passport
+	cfg      config.AppConfig
+	tokenID  uuid.UUID
+	passport authDomain.Passport
 }
 
-func New(cfg config.AppConfig, condiment string, passport authDomain.Passport) *handler {
+func New(cfg config.AppConfig, tokenID uuid.UUID, passport authDomain.Passport) *handler {
 	return &handler{
 		cfg,
-		condiment,
+		tokenID,
 		passport,
 	}
 }
 
-func (h *handler) Signed(tokenType TokenType) (string, error) {
+func (h *handler) Signed(tokenType TokenType) (*AuthClaims, string, error) {
 	subject, err := tokenType.name()
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
 	duration, err := tokenType.duration(h.cfg.Auth)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
 	secret, err := tokenType.secret(h.cfg.Auth)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, AuthClaims{
+	authClaims := AuthClaims{
 		Passport: h.passport,
 		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        h.tokenID.String(),
 			Issuer:    h.cfg.Env.AppName,
 			Subject:   subject,
 			Audience:  []string{"*"},
@@ -100,26 +107,37 @@ func (h *handler) Signed(tokenType TokenType) (string, error) {
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
-	})
+	}
 
-	return token.SignedString([]byte(secret + h.condiment))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, authClaims)
+
+	sined, err := token.SignedString([]byte(secret))
+
+	return &authClaims, sined, err
 }
 
-func (h *handler) Claims(tokenType TokenType, tokenString string) (*AuthClaims, error) {
+func Claims(cfg config.AuthConfig, tokenType TokenType, tokenString string) (*AuthClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		secret, err := tokenType.secret(h.cfg.Auth)
+		secret, err := tokenType.secret(cfg)
 		if err != nil {
 			return nil, err
 		}
 
-		return secret + h.condiment, nil
+		return secret, nil
 	})
 	if err != nil {
-		return nil, err
+		switch {
+		case errors.Is(err, jwt.ErrTokenMalformed), errors.Is(err, jwt.ErrTokenSignatureInvalid), errors.Is(err, jwt.ErrTokenNotValidYet):
+			return nil, ErrInvalidToken
+		case errors.Is(err, jwt.ErrTokenExpired):
+			return nil, ErrTokenExpired
+		default:
+			return nil, err
+		}
 	}
 
 	if claims, ok := token.Claims.(AuthClaims); ok {

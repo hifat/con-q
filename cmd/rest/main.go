@@ -37,7 +37,7 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	wireHandler, cleanUp := di.InitializeAPI(*cfg)
+	wire, cleanUp := di.InitializeAPI(*cfg)
 	defer cleanUp()
 
 	validity.Register()
@@ -47,7 +47,7 @@ func main() {
 
 	api := router.Group("")
 
-	v1 := routeV1.New(api, wireHandler.Handler)
+	v1 := routeV1.New(api, wire.Middleware, wire.Handler)
 	v1.Register()
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

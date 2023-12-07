@@ -2,18 +2,17 @@ package di
 
 import (
 	"github.com/hifat/con-q-api/internal/app/handler"
-
-	"github.com/google/wire"
+	"github.com/hifat/con-q-api/internal/app/middleware"
 )
 
-var AdapterSet = wire.NewSet(NewAdapter)
-
 type Adapter struct {
-	Handler handler.Handler
+	Handler    handler.Handler
+	Middleware middleware.Middleware
 }
 
-func NewAdapter(h handler.Handler) Adapter {
+func NewAdapter(h handler.Handler, m middleware.Middleware) Adapter {
 	return Adapter{
-		Handler: h,
+		Handler:    h,
+		Middleware: m,
 	}
 }
