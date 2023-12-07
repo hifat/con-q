@@ -36,6 +36,14 @@ type ReqLogin struct {
 	ClientIP string `json:"-"`
 }
 
+type ReqAuth struct {
+	ID        uuid.UUID
+	Agent     string
+	ClientIP  string
+	ExpiresAt time.Time
+	UserID    uuid.UUID
+}
+
 type Passport struct {
 	userDomain.User
 }
@@ -49,12 +57,4 @@ type ReqRefreshToken struct {
 	RefreshToken string `json:"refreshToken" example:"eyJhbGciO..."`
 	Agent        string `json:"-"`
 	ClientIP     string `json:"-"`
-}
-
-type ReqAuth struct {
-	ID        uuid.UUID
-	Agent     string
-	ClientIP  string
-	ExpiresAt time.Time
-	UserID    uuid.UUID
 }

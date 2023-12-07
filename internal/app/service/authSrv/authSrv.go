@@ -2,11 +2,14 @@ package authSrv
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/config"
+	"github.com/hifat/con-q-api/internal/app/constant/authConst"
 	"github.com/hifat/con-q-api/internal/app/constant/commonConst"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
+	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
 	"github.com/hifat/con-q-api/internal/pkg/ernos"
 	"github.com/hifat/con-q-api/internal/pkg/helper"
@@ -69,18 +72,27 @@ func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *auth
 		return nil, ernos.InvalidCredentials()
 	}
 
+	err = s.authRepo.RemoveTokenExpires(ctx, user.ID)
+	if err != nil {
+		zlog.Error(err)
+		return nil, ernos.InternalServerError()
+	}
+
+	count, err := s.authRepo.Count(ctx, user.ID)
+	if count >= int64(s.cfg.Auth.MaxDevice) {
+		return nil, ernos.Other(errorDomain.Error{
+			Status:  http.StatusForbidden,
+			Message: authConst.Msg.MAX_DEVICES_LOGIN,
+			Code:    authConst.Code.MAX_DEVICES_LOGIN,
+		})
+	}
+
 	claims := &authDomain.Passport{
 		User: userDomain.User{
 			ID:       user.ID,
 			Username: user.Username,
 			Name:     user.Name,
 		},
-	}
-
-	err = s.authRepo.RemoveTokenExpires(ctx, user.ID)
-	if err != nil {
-		zlog.Error(err)
-		return nil, ernos.InternalServerError()
 	}
 
 	tokenID := uuid.New()

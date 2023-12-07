@@ -13,7 +13,7 @@ type IUserRepo interface {
 }
 
 type User struct {
-	ID        uuid.UUID  `json:"id"`
+	ID        uuid.UUID  `json:"userID" example:"60cf8c94-2c98..."`
 	Username  string     `json:"username" example:"conq"`
 	Name      string     `json:"name" example:"Corn Dog"`
 	Password  string     `json:"-"`
