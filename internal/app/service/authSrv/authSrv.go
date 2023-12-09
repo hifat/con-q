@@ -102,7 +102,7 @@ func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *auth
 		return nil, ernos.InternalServerError()
 	}
 
-	err = s.authRepo.Create(ctx, authDomain.ReqAuth{
+	err = s.authRepo.Save(ctx, authDomain.ReqAuth{
 		ID:        tokenID,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,
@@ -154,7 +154,7 @@ func (s *authSrv) RefreshToken(ctx context.Context, passport authDomain.Passport
 	tokenID := uuid.New()
 	res, exp, err := s.generateToken(tokenID, passport)
 
-	err = s.authRepo.Create(ctx, authDomain.ReqAuth{
+	err = s.authRepo.Save(ctx, authDomain.ReqAuth{
 		ID:        claimsID,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,

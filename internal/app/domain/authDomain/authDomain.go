@@ -11,7 +11,7 @@ import (
 type IAuthRepo interface {
 	Register(ctx context.Context, req ReqRegister) error
 	Count(ctx context.Context, userID uuid.UUID) (int64, error)
-	Create(ctx context.Context, req ReqAuth) error
+	Save(ctx context.Context, req ReqAuth) error
 	Delete(ctx context.Context, authID uuid.UUID) error
 	RemoveTokenExpires(ctx context.Context, userID uuid.UUID) error
 }
@@ -54,7 +54,7 @@ type ResToken struct {
 }
 
 type ReqRefreshToken struct {
-	RefreshToken string `json:"refreshToken" example:"eyJhbGciO..."`
+	RefreshToken string `binding:"required" json:"refreshToken" example:"eyJhbGciO..."`
 	Agent        string `json:"-"`
 	ClientIP     string `json:"-"`
 }

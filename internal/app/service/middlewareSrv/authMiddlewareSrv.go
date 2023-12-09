@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/constant/authConst"
@@ -31,8 +32,9 @@ func New(cfg config.AppConfig, authRepo authDomain.IAuthRepo, userRepo userDomai
 	}
 }
 
-func (s *middlewareSrv) AuthGuard(ctx context.Context, authToken string) (*token.AuthClaims, error) {
-	claims, err := token.Claims(s.cfg.Auth, token.ACCESS, authToken)
+func (s *middlewareSrv) AuthGuard(ctx context.Context, headerToken string) (*token.AuthClaims, error) {
+	accessToken := strings.TrimPrefix(headerToken, "Bearer ")
+	claims, err := token.Claims(s.cfg.Auth, token.ACCESS, accessToken)
 	if err != nil {
 		switch {
 		case errors.Is(err, token.ErrInvalidToken):
