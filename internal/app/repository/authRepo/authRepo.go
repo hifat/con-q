@@ -35,8 +35,8 @@ func (r *authRepo) Count(ctx context.Context, userID uuid.UUID) (int64, error) {
 		Count(&count).Error
 }
 
-func (r *authRepo) Create(ctx context.Context, req authDomain.ReqAuth) error {
-	return r.db.WithContext(ctx).Create(&model.Auth{
+func (r *authRepo) Save(ctx context.Context, req authDomain.ReqAuth) error {
+	return r.db.WithContext(ctx).Save(&model.Auth{
 		ID:        req.ID,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,

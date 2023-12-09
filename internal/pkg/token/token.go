@@ -117,7 +117,7 @@ func (h *handler) Signed(tokenType TokenType) (*AuthClaims, string, error) {
 }
 
 func Claims(cfg config.AuthConfig, tokenType TokenType, tokenString string) (*AuthClaims, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &AuthClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -127,7 +127,7 @@ func Claims(cfg config.AuthConfig, tokenType TokenType, tokenString string) (*Au
 			return nil, err
 		}
 
-		return secret, nil
+		return []byte(secret), nil
 	})
 	if err != nil {
 		switch {
@@ -140,8 +140,8 @@ func Claims(cfg config.AuthConfig, tokenType TokenType, tokenString string) (*Au
 		}
 	}
 
-	if claims, ok := token.Claims.(AuthClaims); ok {
-		return &claims, nil
+	if claims, ok := token.Claims.(*AuthClaims); ok {
+		return claims, nil
 	}
 
 	return nil, err

@@ -8,6 +8,7 @@ import (
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
+	"github.com/hifat/con-q-api/internal/pkg/token"
 	"github.com/hifat/con-q-api/internal/pkg/validity"
 	"github.com/hifat/con-q-api/internal/pkg/zlog"
 )
@@ -75,7 +76,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		validate, err := validity.Validate(err)
 		if err != nil {
 			zlog.Error(err)
-			httpResponse.Error(ctx, validate)
+			httpResponse.Error(ctx, err)
 			return
 		}
 
@@ -108,13 +109,13 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 // @Router		/auth/refresh-token [post]
 // @Param		Body body authDomain.ReqLogin true "Login request"
 func (h *AuthHandler) RefreshToken(ctx *gin.Context) {
-	var req authDomain.ReqLogin
+	var req authDomain.ReqRefreshToken
 	err := ctx.ShouldBind(&req)
 	if err != nil {
 		validate, err := validity.Validate(err)
 		if err != nil {
 			zlog.Error(err)
-			httpResponse.Error(ctx, validate)
+			httpResponse.Error(ctx, err)
 			return
 		}
 
@@ -125,7 +126,8 @@ func (h *AuthHandler) RefreshToken(ctx *gin.Context) {
 	req.Agent = ctx.Request.UserAgent()
 	req.ClientIP = ctx.ClientIP()
 
-	res, err := h.authSrv.Login(ctx.Request.Context(), req)
+	claims := ctx.MustGet("credentials").(*token.AuthClaims)
+	res, err := h.authSrv.RefreshToken(ctx.Request.Context(), claims.Passport, req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
