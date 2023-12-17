@@ -64,6 +64,14 @@ func InvalidCredentials(messages ...string) error {
 	}
 }
 
+func RevokedToken() error {
+	return errorDomain.Error{
+		Status:  http.StatusUnauthorized,
+		Message: authConst.Msg.REVOKED_TOKEN,
+		Code:    authConst.Code.REVOKED_TOKEN,
+	}
+}
+
 func InternalServerError(messages ...string) error {
 	msg := commonConst.Code.INTERNAL_SERVER_ERROR
 	if len(messages) > 0 {
