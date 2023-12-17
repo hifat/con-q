@@ -10,4 +10,5 @@ var Msg = authConstType{
 	TOKEN_EXPIRED:             "token expired",
 	NO_AUTHORIZATION_HEADER:   "no authorization header provided",
 	NO_X_REFRESH_TOKEN_HEADER: "no X-Refresh-Token header provided",
+	REVOKED_TOKEN:             "token has been revoked",
 }

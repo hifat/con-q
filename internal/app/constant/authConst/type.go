@@ -10,4 +10,5 @@ type authConstType struct {
 	TOKEN_EXPIRED             string
 	NO_AUTHORIZATION_HEADER   string
 	NO_X_REFRESH_TOKEN_HEADER string
+	REVOKED_TOKEN             string
 }

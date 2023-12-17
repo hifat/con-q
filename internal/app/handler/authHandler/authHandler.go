@@ -104,7 +104,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 // @Produce		json
 // @Success		200 {object} authDomain.ResToken
 // @Success		401 {object} errorDomain.Response "Invalid Credentials"
-// @Success		422 {object} errorDomain.Response "Form validation error"
+// @Success		401 {object} errorDomain.Response "Revoked Token"
 // @Success		500 {object} errorDomain.Response "Internal server error"
 // @Router		/auth/refresh-token [post]
 // @Param		Body body authDomain.ReqLogin true "Login request"

@@ -139,7 +139,13 @@ func (s *authService) RefreshToken(ctx context.Context, passport authDomain.Pass
 		return nil, ernos.InternalServerError()
 	}
 
-	err = s.authRepo.Delete(ctx, claims.Passport.AuthID)
+	authID := claims.Passport.AuthID
+	exists, err := s.authRepo.Exists(ctx, authID)
+	if !exists {
+		return nil, ernos.RevokedToken()
+	}
+
+	err = s.authRepo.Delete(ctx, authID)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
@@ -147,6 +153,10 @@ func (s *authService) RefreshToken(ctx context.Context, passport authDomain.Pass
 
 	passport.AuthID = uuid.New()
 	res, exp, err := s.generateToken(passport)
+	if err != nil {
+		zlog.Error(err)
+		return nil, ernos.InternalServerError()
+	}
 
 	err = s.authRepo.Save(ctx, authDomain.ReqAuth{
 		ID:        passport.AuthID,

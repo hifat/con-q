@@ -9,6 +9,7 @@ import (
 )
 
 type IAuthRepo interface {
+	Exists(ctx context.Context, authID uuid.UUID) (bool, error)
 	Register(ctx context.Context, req ReqRegister) error
 	Count(ctx context.Context, userID uuid.UUID) (int64, error)
 	Save(ctx context.Context, req ReqAuth) error
