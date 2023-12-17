@@ -1,40 +1,21 @@
-package middlewareSrv
+package middlewareService
 
 import (
 	"context"
 	"errors"
 	"net/http"
-	"strings"
 
-	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/constant/authConst"
-	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
-	"github.com/hifat/con-q-api/internal/app/domain/middlewareDomain"
-	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
 	"github.com/hifat/con-q-api/internal/pkg/ernos"
+	"github.com/hifat/con-q-api/internal/pkg/helper"
 	"github.com/hifat/con-q-api/internal/pkg/token"
 	"github.com/hifat/con-q-api/internal/pkg/zlog"
 )
 
-type middlewareSrv struct {
-	cfg config.AppConfig
-
-	authRepo authDomain.IAuthRepo
-	userRepo userDomain.IUserRepo
-}
-
-func New(cfg config.AppConfig, authRepo authDomain.IAuthRepo, userRepo userDomain.IUserRepo) middlewareDomain.IMiddlewareService {
-	return &middlewareSrv{
-		cfg,
-		authRepo,
-		userRepo,
-	}
-}
-
-func (s *middlewareSrv) AuthGuard(ctx context.Context, headerToken string) (*token.AuthClaims, error) {
-	accessToken := strings.TrimPrefix(headerToken, "Bearer ")
-	claims, err := token.Claims(s.cfg.Auth, token.ACCESS, accessToken)
+func (s *middlewareService) verifyToken(ctx context.Context, tokenType token.TokenType, headerToken string) (*token.AuthClaims, error) {
+	accessToken := helper.GetBearerToken(headerToken)
+	claims, err := token.Claims(s.cfg.Auth, tokenType, accessToken)
 	if err != nil {
 		switch {
 		case errors.Is(err, token.ErrInvalidToken):

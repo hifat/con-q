@@ -1,14 +1,6 @@
 package commonConst
 
-type codeType struct {
-	DUPLICATE_RECORD      string
-	RECORD_NOTFOUND       string
-	UNAUTHORIZED          string
-	INTERNAL_SERVER_ERROR string
-	TOO_MANY_REQUEST      string
-}
-
-var Code = codeType{
+var Code = commonConstType{
 	RECORD_NOTFOUND:       "RECORD_NOTFOUND",
 	DUPLICATE_RECORD:      "DUPLICATE_RECORD",
 	UNAUTHORIZED:          "UNAUTHORIZED",

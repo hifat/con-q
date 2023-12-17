@@ -1,4 +1,4 @@
-package authHdl
+package authHandler
 
 import (
 	"net/http"
@@ -16,11 +16,11 @@ import (
 type AuthHandler struct {
 	cfg config.AppConfig
 
-	authSrv authDomain.IAuthSrv
+	authService authDomain.IAuthService
 }
 
-func New(cfg config.AppConfig, authSrv authDomain.IAuthSrv) AuthHandler {
-	return AuthHandler{cfg, authSrv}
+func New(cfg config.AppConfig, authService authDomain.IAuthService) AuthHandler {
+	return AuthHandler{cfg, authService}
 }
 
 // @Summary		Register
@@ -48,7 +48,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 		return
 	}
 
-	err = h.authSrv.Register(ctx.Request.Context(), req)
+	err = h.authService.Register(ctx.Request.Context(), req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
@@ -87,7 +87,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 	req.Agent = ctx.Request.UserAgent()
 	req.ClientIP = ctx.ClientIP()
 
-	res, err := h.authSrv.Login(ctx.Request.Context(), req)
+	res, err := h.authService.Login(ctx.Request.Context(), req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
@@ -109,25 +109,14 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 // @Router		/auth/refresh-token [post]
 // @Param		Body body authDomain.ReqLogin true "Login request"
 func (h *AuthHandler) RefreshToken(ctx *gin.Context) {
-	var req authDomain.ReqRefreshToken
-	err := ctx.ShouldBind(&req)
-	if err != nil {
-		validate, err := validity.Validate(err)
-		if err != nil {
-			zlog.Error(err)
-			httpResponse.Error(ctx, err)
-			return
-		}
-
-		httpResponse.FormErr(ctx, h.cfg.Env.AppMode, validate)
-		return
+	req := authDomain.ReqRefreshToken{
+		Agent:        ctx.Request.UserAgent(),
+		ClientIP:     ctx.ClientIP(),
+		RefreshToken: ctx.MustGet("refreshToken").(string),
 	}
 
-	req.Agent = ctx.Request.UserAgent()
-	req.ClientIP = ctx.ClientIP()
-
 	claims := ctx.MustGet("credentials").(*token.AuthClaims)
-	res, err := h.authSrv.RefreshToken(ctx.Request.Context(), claims.Passport, req)
+	res, err := h.authService.RefreshToken(ctx.Request.Context(), claims.Passport, req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return

@@ -1,4 +1,4 @@
-package authSrv
+package authService
 
 import (
 	"context"
@@ -18,18 +18,18 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type authSrv struct {
+type authService struct {
 	cfg config.AppConfig
 
 	authRepo authDomain.IAuthRepo
 	userRepo userDomain.IUserRepo
 }
 
-func New(cfg config.AppConfig, authRepo authDomain.IAuthRepo, userRepo userDomain.IUserRepo) authDomain.IAuthSrv {
-	return &authSrv{cfg, authRepo, userRepo}
+func New(cfg config.AppConfig, authRepo authDomain.IAuthRepo, userRepo userDomain.IUserRepo) authDomain.IAuthService {
+	return &authService{cfg, authRepo, userRepo}
 }
 
-func (s *authSrv) Register(ctx context.Context, req authDomain.ReqRegister) error {
+func (s *authService) Register(ctx context.Context, req authDomain.ReqRegister) error {
 	exists, err := s.userRepo.Exists("username", req.Username)
 	if err != nil {
 		zlog.Error(err)
@@ -55,7 +55,7 @@ func (s *authSrv) Register(ctx context.Context, req authDomain.ReqRegister) erro
 	return nil
 }
 
-func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *authDomain.ResToken, err error) {
+func (s *authService) Login(ctx context.Context, req authDomain.ReqLogin) (res *authDomain.ResToken, err error) {
 	var user userDomain.User
 	err = s.userRepo.FirstByCol(ctx, &user, "username", req.Username)
 	if err != nil {
@@ -87,7 +87,7 @@ func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *auth
 		})
 	}
 
-	claims := &authDomain.Passport{
+	passport := &authDomain.Passport{
 		User: userDomain.User{
 			ID:       user.ID,
 			Username: user.Username,
@@ -95,15 +95,15 @@ func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *auth
 		},
 	}
 
-	tokenID := uuid.New()
-	res, exp, err := s.generateToken(tokenID, *claims)
+	passport.AuthID = uuid.New()
+	res, exp, err := s.generateToken(*passport)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 
 	err = s.authRepo.Save(ctx, authDomain.ReqAuth{
-		ID:        tokenID,
+		ID:        passport.AuthID,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,
 		UserID:    user.ID,
@@ -117,20 +117,20 @@ func (s *authSrv) Login(ctx context.Context, req authDomain.ReqLogin) (res *auth
 	return res, nil
 }
 
-func (s *authSrv) Logout(ctx context.Context, tokenID uuid.UUID) error {
+func (s *authService) Logout(ctx context.Context, tokenID uuid.UUID) error {
 	return s.authRepo.Delete(ctx, tokenID)
 }
 
-func (s *authSrv) RefreshToken(ctx context.Context, passport authDomain.Passport, req authDomain.ReqRefreshToken) (*authDomain.ResToken, error) {
+func (s *authService) RefreshToken(ctx context.Context, passport authDomain.Passport, req authDomain.ReqRefreshToken) (*authDomain.ResToken, error) {
 	var user userDomain.User
-	err := s.userRepo.FirstByCol(ctx, &user, "username", passport.Username)
+	err := s.userRepo.FirstByCol(ctx, &user, "username", passport.User.Username)
 	if err != nil {
 		if err.Error() == commonConst.Msg.RECORD_NOTFOUND {
 			zlog.Error(err)
-			return nil, ernos.InternalServerError()
+			return nil, ernos.InvalidCredentials()
 		}
 
-		return nil, ernos.InvalidCredentials()
+		return nil, ernos.InternalServerError()
 	}
 
 	claims, err := token.Claims(s.cfg.Auth, token.REFRESH, req.RefreshToken)
@@ -139,23 +139,17 @@ func (s *authSrv) RefreshToken(ctx context.Context, passport authDomain.Passport
 		return nil, ernos.InternalServerError()
 	}
 
-	claimsID, err := uuid.Parse(claims.ID)
+	err = s.authRepo.Delete(ctx, claims.Passport.AuthID)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 
-	err = s.authRepo.Delete(ctx, claimsID)
-	if err != nil {
-		zlog.Error(err)
-		return nil, ernos.InternalServerError()
-	}
-
-	tokenID := uuid.New()
-	res, exp, err := s.generateToken(tokenID, passport)
+	passport.AuthID = uuid.New()
+	res, exp, err := s.generateToken(passport)
 
 	err = s.authRepo.Save(ctx, authDomain.ReqAuth{
-		ID:        claimsID,
+		ID:        passport.AuthID,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,
 		UserID:    user.ID,

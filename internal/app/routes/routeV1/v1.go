@@ -10,14 +10,14 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-type Route struct {
+type route struct {
 	router     *gin.RouterGroup
 	middleware middleware.Middleware
 	handler    handler.Handler
 }
 
-func New(router *gin.RouterGroup, middleware middleware.Middleware, handler handler.Handler) *Route {
-	return &Route{
+func New(router *gin.RouterGroup, middleware middleware.Middleware, handler handler.Handler) *route {
+	return &route{
 		router,
 		middleware,
 		handler,
@@ -38,7 +38,7 @@ func New(router *gin.RouterGroup, middleware middleware.Middleware, handler hand
 // @name Authorization
 
 // @BasePath /v1
-func (r *Route) Register() {
+func (r *route) Register() {
 	v1 := r.router.Group("v1")
 	v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler(), ginSwagger.InstanceName("v1")))
 
@@ -51,5 +51,5 @@ func (r *Route) Register() {
 	authHandler := r.handler.Auth
 	authRoute.POST("/register", authHandler.Register)
 	authRoute.POST("/login", authHandler.Login)
-	authRoute.POST("/refresh-token", authMiddleware.AuthGuard(), authHandler.RefreshToken)
+	authRoute.POST("/refresh-token", authMiddleware.RefreshTokenGuard(), authHandler.RefreshToken)
 }

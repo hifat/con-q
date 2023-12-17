@@ -8,7 +8,5 @@ func HashPassword(password string) (hash string, err error) {
 		return "", err
 	}
 
-	hash = string(newHash)
-
-	return hash, err
+	return string(newHash), err
 }
