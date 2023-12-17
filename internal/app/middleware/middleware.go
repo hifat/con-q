@@ -1,13 +1,13 @@
 package middleware
 
-import "github.com/hifat/con-q-api/internal/app/middleware/authMdl"
+import "github.com/hifat/con-q-api/internal/app/middleware/authMiddleware"
 
 type Middleware struct {
-	Auth authMdl.AuthMiddleware
+	Auth authMiddleware.AuthMiddleware
 }
 
-func New(authMdl authMdl.AuthMiddleware) Middleware {
+func New(authMiddleware authMiddleware.AuthMiddleware) Middleware {
 	return Middleware{
-		Auth: authMdl,
+		Auth: authMiddleware,
 	}
 }

@@ -1,9 +1,8 @@
-package authSrv
+package authService
 
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 	"github.com/hifat/con-q-api/internal/pkg/token"
 )
@@ -13,8 +12,8 @@ type expiresToken struct {
 	Refresh time.Time
 }
 
-func (s *authSrv) generateToken(tokenID uuid.UUID, claims authDomain.Passport) (*authDomain.ResToken, *expiresToken, error) {
-	newToken := token.New(s.cfg, tokenID, claims)
+func (s *authService) generateToken(claims authDomain.Passport) (*authDomain.ResToken, *expiresToken, error) {
+	newToken := token.New(s.cfg, claims)
 	accessClaims, accessToken, err := newToken.Signed(token.ACCESS)
 	if err != nil {
 		return nil, nil, err

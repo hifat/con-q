@@ -1,16 +1,16 @@
 package handler
 
 import (
-	"github.com/hifat/con-q-api/internal/app/handler/authHdl"
-	"github.com/hifat/con-q-api/internal/app/handler/healtzHdl"
+	"github.com/hifat/con-q-api/internal/app/handler/authHandler"
+	"github.com/hifat/con-q-api/internal/app/handler/healtzHandler"
 )
 
 type Handler struct {
-	Healtz healtzHdl.HealtzHandler
-	Auth   authHdl.AuthHandler
+	Healtz healtzHandler.HealtzHandler
+	Auth   authHandler.AuthHandler
 }
 
-func New(HealtzHandler healtzHdl.HealtzHandler, AuthHandler authHdl.AuthHandler) Handler {
+func New(HealtzHandler healtzHandler.HealtzHandler, AuthHandler authHandler.AuthHandler) Handler {
 	return Handler{
 		Healtz: HealtzHandler,
 		Auth:   AuthHandler,

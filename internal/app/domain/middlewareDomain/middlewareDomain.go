@@ -7,5 +7,6 @@ import (
 )
 
 type IMiddlewareService interface {
-	AuthGuard(ctx context.Context, authToken string) (*token.AuthClaims, error)
+	AuthGuard(ctx context.Context, headerToken string) (*token.AuthClaims, error)
+	RefreshTokenGuard(ctx context.Context, headerToken string) (*token.AuthClaims, error)
 }

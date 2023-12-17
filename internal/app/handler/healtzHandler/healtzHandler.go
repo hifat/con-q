@@ -1,4 +1,4 @@
-package healtzHdl
+package healtzHandler
 
 import (
 	"net/http"

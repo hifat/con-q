@@ -12,6 +12,7 @@ type User struct {
 	Username  string         `gorm:"type:varchar(100);unique" json:"username"`
 	Password  string         `gorm:"type:varchar(200);" json:"password"`
 	Name      string         `gorm:"type:varchar(100);" json:"name"`
+	Foo       string         `gorm:"type:varchar(100);" json:"foo"`
 	CreatedAt time.Time      `json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`

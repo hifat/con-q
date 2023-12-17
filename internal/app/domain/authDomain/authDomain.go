@@ -16,7 +16,7 @@ type IAuthRepo interface {
 	RemoveTokenExpires(ctx context.Context, userID uuid.UUID) error
 }
 
-type IAuthSrv interface {
+type IAuthService interface {
 	Register(ctx context.Context, req ReqRegister) error
 	Login(ctx context.Context, req ReqLogin) (*ResToken, error)
 	Logout(ctx context.Context, tokenID uuid.UUID) error
@@ -45,7 +45,8 @@ type ReqAuth struct {
 }
 
 type Passport struct {
-	userDomain.User
+	AuthID uuid.UUID
+	User   userDomain.User
 }
 
 type ResToken struct {

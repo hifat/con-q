@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 )
@@ -68,14 +67,12 @@ func (t TokenType) secret(cfg config.AuthConfig) (string, error) {
 
 type handler struct {
 	cfg      config.AppConfig
-	tokenID  uuid.UUID
 	passport authDomain.Passport
 }
 
-func New(cfg config.AppConfig, tokenID uuid.UUID, passport authDomain.Passport) *handler {
+func New(cfg config.AppConfig, passport authDomain.Passport) *handler {
 	return &handler{
 		cfg,
-		tokenID,
 		passport,
 	}
 }
@@ -99,7 +96,6 @@ func (h *handler) Signed(tokenType TokenType) (*AuthClaims, string, error) {
 	authClaims := AuthClaims{
 		Passport: h.passport,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ID:        h.tokenID.String(),
 			Issuer:    h.cfg.Env.AppName,
 			Subject:   subject,
 			Audience:  []string{"*"},

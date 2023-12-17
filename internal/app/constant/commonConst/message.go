@@ -1,13 +1,6 @@
 package commonConst
 
-type msgType struct {
-	DUPLICATE_RECORD      string
-	RECORD_NOTFOUND       string
-	INTERNAL_SERVER_ERROR string
-	TOO_MANY_REQUEST      string
-}
-
-var Msg = msgType{
+var Msg = commonConstType{
 	RECORD_NOTFOUND:       "record not found",
 	DUPLICATE_RECORD:      "duplicate record",
 	INTERNAL_SERVER_ERROR: "internal server error",

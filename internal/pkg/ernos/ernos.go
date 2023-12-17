@@ -35,27 +35,18 @@ func RecordNotFound(messages ...string) error {
 	}
 }
 
-func Forbidden(messages string) error {
-	msg := http.StatusText(http.StatusForbidden)
-	if messages != "" {
-		msg = messages
-	}
-
+func Forbidden() error {
 	return errorDomain.Error{
-		Message: msg,
+		Status:  http.StatusForbidden,
+		Message: strings.ToLower(http.StatusText(http.StatusForbidden)),
 		Code:    commonConst.Code.RECORD_NOTFOUND,
 	}
 }
 
-func Unauthorized(messages ...string) error {
-	msg := authConst.Msg.UNAUTHORIZED
-	if len(messages) > 0 {
-		msg = strings.Join(messages, "")
-	}
-
+func Unauthorized() error {
 	return errorDomain.Error{
 		Status:  http.StatusUnauthorized,
-		Message: msg,
+		Message: authConst.Msg.UNAUTHORIZED,
 		Code:    authConst.Code.UNAUTHORIZED,
 	}
 }
@@ -86,10 +77,6 @@ func InternalServerError(messages ...string) error {
 	}
 }
 
-func Other(e errorDomain.Error) error {
-	return e
-}
-
 func Detect(err error) error {
 	set := map[any]error{
 		commonConst.Msg.RECORD_NOTFOUND: RecordNotFound(),
@@ -100,4 +87,8 @@ func Detect(err error) error {
 	}
 
 	return set[err.Error()]
+}
+
+func Other(e errorDomain.Error) error {
+	return e
 }

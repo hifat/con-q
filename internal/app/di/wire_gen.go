@@ -11,29 +11,29 @@ import (
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/database"
 	"github.com/hifat/con-q-api/internal/app/handler"
-	"github.com/hifat/con-q-api/internal/app/handler/authHdl"
-	"github.com/hifat/con-q-api/internal/app/handler/healtzHdl"
+	"github.com/hifat/con-q-api/internal/app/handler/authHandler"
+	"github.com/hifat/con-q-api/internal/app/handler/healtzHandler"
 	"github.com/hifat/con-q-api/internal/app/middleware"
-	"github.com/hifat/con-q-api/internal/app/middleware/authMdl"
+	"github.com/hifat/con-q-api/internal/app/middleware/authMiddleware"
 	"github.com/hifat/con-q-api/internal/app/repository/authRepo"
 	"github.com/hifat/con-q-api/internal/app/repository/userRepo"
-	"github.com/hifat/con-q-api/internal/app/service/authSrv"
-	"github.com/hifat/con-q-api/internal/app/service/middlewareSrv"
+	"github.com/hifat/con-q-api/internal/app/service/authService"
+	"github.com/hifat/con-q-api/internal/app/service/middlewareService"
 )
 
 // Injectors from wire.go:
 
 func InitializeAPI(cfg config.AppConfig) (Adapter, func()) {
-	healtzHandler := healtzHdl.New()
+	healtzHandlerHealtzHandler := healtzHandler.New()
 	db, cleanup := database.NewPostgresConnection(cfg)
 	iAuthRepo := authRepo.New(db)
 	iUserRepo := userRepo.New(db)
-	iAuthSrv := authSrv.New(cfg, iAuthRepo, iUserRepo)
-	authHandler := authHdl.New(cfg, iAuthSrv)
-	handlerHandler := handler.New(healtzHandler, authHandler)
-	iMiddlewareService := middlewareSrv.New(cfg, iAuthRepo, iUserRepo)
-	authMiddleware := authMdl.New(cfg, iMiddlewareService)
-	middlewareMiddleware := middleware.New(authMiddleware)
+	iAuthService := authService.New(cfg, iAuthRepo, iUserRepo)
+	authHandlerAuthHandler := authHandler.New(cfg, iAuthService)
+	handlerHandler := handler.New(healtzHandlerHealtzHandler, authHandlerAuthHandler)
+	iMiddlewareService := middlewareService.New(cfg, iAuthRepo, iUserRepo)
+	authMiddlewareAuthMiddleware := authMiddleware.New(cfg, iMiddlewareService)
+	middlewareMiddleware := middleware.New(authMiddlewareAuthMiddleware)
 	adapter := NewAdapter(handlerHandler, middlewareMiddleware)
 	return adapter, func() {
 		cleanup()
@@ -44,6 +44,8 @@ func InitializeAPI(cfg config.AppConfig) (Adapter, func()) {
 
 var RepoSet = wire.NewSet(database.NewPostgresConnection, authRepo.New, userRepo.New)
 
-var ServiceSet = wire.NewSet(authSrv.New, middlewareSrv.New)
+var ServiceSet = wire.NewSet(authService.New, middlewareService.New)
 
-var HandlerSet = wire.NewSet(handler.New, middleware.New, authMdl.New, healtzHdl.New, authHdl.New)
+var HandlerSet = wire.NewSet(handler.New, middleware.New, authMiddleware.New, healtzHandler.New, authHandler.New)
+
+var AdapterSet = wire.NewSet(NewAdapter)

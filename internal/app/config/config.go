@@ -33,7 +33,7 @@ type DBConfig struct {
 }
 
 type AuthConfig struct {
-	ApiKey               string        `envconfig:"API_KEY"`
+	ApiKey               string        `envconfig:"API_KEY_SECRET"`
 	AccessTokenSecret    string        `envconfig:"ACCESS_TOKEN_SECRET"`
 	AccessTokenDuration  time.Duration `envconfig:"ACCESS_TOKEN_DURATION"`
 	RefreshTokenSecret   string        `envconfig:"REFRESH_TOKEN_SECRET"`
