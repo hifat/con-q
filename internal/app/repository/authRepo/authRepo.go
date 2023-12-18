@@ -20,7 +20,8 @@ func New(db *gorm.DB) authDomain.IAuthRepo {
 
 func (r *authRepo) Exists(ctx context.Context, authID uuid.UUID) (bool, error) {
 	var exists bool
-	return exists, r.db.Model(&model.Auth{}).
+	return exists, r.db.WithContext(ctx).
+		Model(&model.Auth{}).
 		Select("COUNT(*) > 0").
 		Where("id = ?", authID).
 		Find(&exists).Error
@@ -44,23 +45,26 @@ func (r *authRepo) Count(ctx context.Context, userID uuid.UUID) (int64, error) {
 }
 
 func (r *authRepo) Save(ctx context.Context, req authDomain.ReqAuth) error {
-	return r.db.WithContext(ctx).Save(&model.Auth{
-		ID:        req.ID,
-		Agent:     req.Agent,
-		ClientIP:  req.ClientIP,
-		ExpiresAt: req.ExpiresAt,
+	return r.db.WithContext(ctx).
+		Save(&model.Auth{
+			ID:        req.ID,
+			Agent:     req.Agent,
+			ClientIP:  req.ClientIP,
+			ExpiresAt: req.ExpiresAt,
 
-		UserID: req.UserID,
-	}).Error
+			UserID: req.UserID,
+		}).Error
 }
 
 func (r *authRepo) Delete(ctx context.Context, authID uuid.UUID) error {
-	return r.db.Debug().Where("id = ?", authID).
+	return r.db.WithContext(ctx).
+		Where("id = ?", authID).
 		Delete(&model.Auth{}).Error
 }
 
 func (r *authRepo) RemoveTokenExpires(ctx context.Context, userID uuid.UUID) error {
-	return r.db.Where("user_id = ?", userID).
+	return r.db.WithContext(ctx).
+		Where("user_id = ?", userID).
 		Where("expires_at <= ?", time.Now().Format(time.RFC3339)).
 		Delete(&model.Auth{}).Error
 }
