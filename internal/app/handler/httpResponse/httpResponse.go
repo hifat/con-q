@@ -5,9 +5,17 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hifat/con-q-api/internal/app/config"
+	"github.com/hifat/con-q-api/internal/app/constant/commonConst"
 	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
 	"github.com/hifat/con-q-api/internal/pkg/zlog"
 )
+
+var cfg *config.AppConfig
+
+func init() {
+	cfg = config.LoadAppConfig()
+}
 
 func Error(ctx *gin.Context, err any) {
 	if e, ok := err.(errorDomain.Error); ok {
@@ -17,7 +25,13 @@ func Error(ctx *gin.Context, err any) {
 		return
 	}
 
-	ctx.AbortWithStatusJSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+	ctx.AbortWithStatusJSON(http.StatusInternalServerError, errorDomain.Response{
+		Error: errorDomain.Error{
+			Status:  http.StatusInternalServerError,
+			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
+			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
+		},
+	})
 }
 
 func handleErr(err any) errorDomain.Response {
@@ -37,12 +51,18 @@ func handleErr(err any) errorDomain.Response {
 }
 
 func BadRequest(ctx *gin.Context, err any) {
-	ctx.AbortWithStatusJSON(http.StatusBadRequest, err.(error).Error())
+	ctx.AbortWithStatusJSON(http.StatusBadRequest, errorDomain.Response{
+		Error: errorDomain.Error{
+			Status:  http.StatusBadRequest,
+			Message: err.(error).Error(),
+			Code:    commonConst.Code.BAD_REQUEST,
+		},
+	})
 }
 
-func FormErr(ctx *gin.Context, appMode string, err any) {
+func FormErr(ctx *gin.Context, err any) {
 	resError := handleErr(err)
-	if appMode == "develop" {
+	if cfg.Env.AppMode == "develop" {
 		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, resError)
 		return
 	}

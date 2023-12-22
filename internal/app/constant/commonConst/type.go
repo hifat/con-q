@@ -6,4 +6,5 @@ type commonConstType struct {
 	UNAUTHORIZED          string
 	INTERNAL_SERVER_ERROR string
 	TOO_MANY_REQUEST      string
+	BAD_REQUEST           string
 }
