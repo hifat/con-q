@@ -8,6 +8,7 @@ import (
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/constant/commonConst"
 	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
+	"github.com/hifat/con-q-api/internal/pkg/validity"
 	"github.com/hifat/con-q-api/internal/pkg/zlog"
 )
 
@@ -60,7 +61,18 @@ func BadRequest(ctx *gin.Context, err any) {
 	})
 }
 
-func FormErr(ctx *gin.Context, err any) {
+func ValidateFormErr(ctx *gin.Context, err error) {
+	validate, err := validity.Validate(err)
+	if err != nil {
+		zlog.Error(err)
+		Error(ctx, err)
+		return
+	}
+
+	formErr(ctx, validate)
+}
+
+func formErr(ctx *gin.Context, err any) {
 	resError := handleErr(err)
 	if cfg.Env.AppMode == "develop" {
 		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, resError)
@@ -70,17 +82,17 @@ func FormErr(ctx *gin.Context, err any) {
 	jsonBytes, err := json.MarshalIndent(resError, "", "  ")
 	if err != nil {
 		Error(ctx, err)
+		return
 	}
 
 	zlog.Skip(0).Warn(string(jsonBytes))
 	ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, errorDomain.Response{
 		Error: errorDomain.Error{
 			Status:  http.StatusUnprocessableEntity,
-			Message: "validate failed",
-			Code:    http.StatusText(http.StatusUnprocessableEntity),
+			Message: commonConst.Msg.INVALID_FORM_VALIDATION,
+			Code:    commonConst.Code.INVALID_FORM_VALIDATION,
 		},
 	})
-	return
 }
 
 func Created(ctx *gin.Context, obj any) {
