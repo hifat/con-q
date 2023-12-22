@@ -44,7 +44,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 			return
 		}
 
-		httpResponse.FormErr(ctx, h.cfg.Env.AppMode, validate)
+		httpResponse.FormErr(ctx, validate)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 			return
 		}
 
-		httpResponse.FormErr(ctx, h.cfg.Env.AppMode, validate)
+		httpResponse.FormErr(ctx, validate)
 		return
 	}
 
