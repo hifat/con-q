@@ -9,8 +9,6 @@ import (
 	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
 	"github.com/hifat/con-q-api/internal/pkg/token"
-	"github.com/hifat/con-q-api/internal/pkg/validity"
-	"github.com/hifat/con-q-api/internal/pkg/zlog"
 )
 
 type AuthHandler struct {
@@ -37,14 +35,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	var req authDomain.ReqRegister
 	err := ctx.ShouldBind(&req)
 	if err != nil {
-		validate, err := validity.Validate(err)
-		if err != nil {
-			zlog.Error(err)
-			httpResponse.Error(ctx, err)
-			return
-		}
-
-		httpResponse.FormErr(ctx, validate)
+		httpResponse.ValidateFormErr(ctx, err)
 		return
 	}
 
@@ -73,14 +64,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 	var req authDomain.ReqLogin
 	err := ctx.ShouldBind(&req)
 	if err != nil {
-		validate, err := validity.Validate(err)
-		if err != nil {
-			zlog.Error(err)
-			httpResponse.Error(ctx, err)
-			return
-		}
-
-		httpResponse.FormErr(ctx, validate)
+		httpResponse.ValidateFormErr(ctx, err)
 		return
 	}
 
