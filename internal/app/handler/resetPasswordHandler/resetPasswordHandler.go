@@ -20,12 +20,12 @@ func New(resetPasswordService resetPasswordDomain.IResetPasswordService) ResetPa
 // @Tags		Auth
 // @Accept		json
 // @Produce		json
-// @Success		200 {object} resetPasswordDomain.ReqRequest
+// @Success		200 {object} resetPasswordDomain.ReqCreate
 // @Success		409 {object} errorDomain.Response "Duplicate record"
 // @Success		422 {object} errorDomain.Response "Form validation error"
 // @Success		500 {object} errorDomain.Response "Internal server error"
 // @Router		/reset-password [post]
-// @Param		Body body resetPasswordDomain.ReqRequest true "Request request"
+// @Param		Body body resetPasswordDomain.ReqCreate true "Request request"
 func (h *ResetPasswordHandler) Request(ctx *gin.Context) {
 	var req resetPasswordDomain.ReqCreate
 	err := ctx.ShouldBind(&req)

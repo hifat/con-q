@@ -59,6 +59,23 @@ definitions:
       error:
         $ref: '#/definitions/errorDomain.Error'
     type: object
+  resetPasswordDomain.ReqCreate:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  resetPasswordDomain.ReqResetPassword:
+    properties:
+      code:
+        type: string
+      password:
+        type: string
+    required:
+    - code
+    - password
+    type: object
 info:
   contact: {}
   description: This is a sample server celler server.
@@ -121,11 +138,7 @@ paths:
           schema:
             $ref: '#/definitions/authDomain.ResToken'
         "401":
-          description: Invalid Credentials
-          schema:
-            $ref: '#/definitions/errorDomain.Response'
-        "422":
-          description: Form validation error
+          description: Revoked Token
           schema:
             $ref: '#/definitions/errorDomain.Response'
         "500":
@@ -187,6 +200,71 @@ paths:
           schema:
             type: string
       summary: Healt Check
+  /reset-password:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request request
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/resetPasswordDomain.ReqResetPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/resetPasswordDomain.ReqResetPassword'
+        "409":
+          description: Duplicate record
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "422":
+          description: Form validation error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+      summary: Reset Password
+      tags:
+      - Auth
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request request
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/resetPasswordDomain.ReqCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/resetPasswordDomain.ReqCreate'
+        "409":
+          description: Duplicate record
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "422":
+          description: Form validation error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/errorDomain.Response'
+      summary: Request Reset Password
+      tags:
+      - Auth
 security:
 - bearer: []
 securityDefinitions:
