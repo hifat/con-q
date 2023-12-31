@@ -13,8 +13,9 @@ import (
 type TokenType int64
 
 var (
-	ErrInvalidToken = errors.New("invalid token")
-	ErrTokenExpired = errors.New("token expired")
+	ErrInvalidToken      = errors.New("invalid token")
+	ErrTokenExpired      = errors.New("token expired")
+	ErrNotFoundTokenType = errors.New("not found token type")
 )
 
 const (
@@ -26,8 +27,6 @@ const (
 	refresh_name = "refresh-token"
 	access_name  = "access-token"
 )
-
-var ErrNotFoundTokenType = errors.New("not found token type")
 
 func (t TokenType) name() (string, error) {
 	tokenTypes := map[TokenType]string{

@@ -52,4 +52,8 @@ func (r *route) Register() {
 	authRoute.POST("/register", authHandler.Register)
 	authRoute.POST("/login", authHandler.Login)
 	authRoute.POST("/refresh-token", authMiddleware.RefreshTokenGuard(), authHandler.RefreshToken)
+
+	resetPasswordHandler := r.handler.ResetPassword
+	authRoute.POST("/reset-password", resetPasswordHandler.Request)
+	authRoute.PATCH("/reset-password", resetPasswordHandler.Reset)
 }

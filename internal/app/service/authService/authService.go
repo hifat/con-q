@@ -60,10 +60,10 @@ func (s *authService) Login(ctx context.Context, req authDomain.ReqLogin) (res *
 	err = s.userRepo.FirstByCol(ctx, &user, "username", req.Username)
 	if err != nil {
 		if err.Error() == commonConst.Msg.RECORD_NOTFOUND {
-			zlog.Error(err)
 			return nil, ernos.InvalidCredentials()
 		}
 
+		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 

@@ -64,7 +64,7 @@ func BadRequest(ctx *gin.Context, err any) {
 func ValidateFormErr(ctx *gin.Context, err error) {
 	validate, err := validity.Validate(err)
 	if err != nil {
-		zlog.Error(err)
+		zlog.Skip(0).Error(err.Error())
 		Error(ctx, err)
 		return
 	}
