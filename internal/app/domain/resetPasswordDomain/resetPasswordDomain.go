@@ -13,6 +13,7 @@ type IResetPasswordRepo interface {
 	Create(ctx context.Context, req ReqCreate) error
 	CanUsed(ctx context.Context, resetID uuid.UUID) (bool, error)
 	MakeUsed(ctx context.Context, resetID uuid.UUID) error
+	RevokedByCol(ctx context.Context, col string, expected any) error
 }
 
 type IResetPasswordService interface {
@@ -21,12 +22,13 @@ type IResetPasswordService interface {
 }
 
 type ResetPassword struct {
-	ID        uuid.UUID  `gorm:"primaryKey; type:uuid; default:uuid_generate_v4()" json:"id"`
-	UserID    uuid.UUID  `gorm:"type:uuid" json:"userID"`
-	Code      string     `gorm:"type:varchar(20)" json:"code"`
-	Agent     string     `gorm:"type:varchar(100)" json:"agent"`
-	ClientIP  string     `gorm:"type:varchar(30)" json:"clientIP"`
-	IsUsed    bool       `gorm:"default:false" json:"isUsed"`
+	ID        uuid.UUID  `json:"id"`
+	UserID    uuid.UUID  `json:"userID"`
+	Code      string     `json:"code"`
+	Agent     string     `json:"agent"`
+	ClientIP  string     `json:"clientIP"`
+	UsedAt    *time.Time `json:"usedAt"`
+	RevokedAt *time.Time `json:"revokedAt"`
 	ExpiresAt time.Time  `json:"expiresAt"`
 	CreatedAt *time.Time `json:"createdAt,omitempty"`
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`

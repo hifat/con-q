@@ -54,6 +54,16 @@ func (s *resetPasswordService) Request(ctx context.Context, req resetPasswordDom
 		}
 	}
 
+	err = s.resetPasswordRepo.RevokedByCol(ctx, "user_id", user.ID)
+	if err != nil {
+		zlog.Error(err)
+		return errorDomain.Error{
+			Status:  http.StatusInternalServerError,
+			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
+			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
+		}
+	}
+
 	newID := uuid.New()
 	code := strings.Split(newID.String(), "-")[0]
 	req = resetPasswordDomain.ReqCreate{
