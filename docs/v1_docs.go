@@ -102,13 +102,7 @@ const docTemplatev1 = `{
                         }
                     },
                     "401": {
-                        "description": "Invalid Credentials",
-                        "schema": {
-                            "$ref": "#/definitions/errorDomain.Response"
-                        }
-                    },
-                    "422": {
-                        "description": "Form validation error",
+                        "description": "Revoked Token",
                         "schema": {
                             "$ref": "#/definitions/errorDomain.Response"
                         }
@@ -202,6 +196,106 @@ const docTemplatev1 = `{
                     }
                 }
             }
+        },
+        "/reset-password": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Request Reset Password",
+                "parameters": [
+                    {
+                        "description": "Request request",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/resetPasswordDomain.ReqCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/resetPasswordDomain.ReqCreate"
+                        }
+                    },
+                    "409": {
+                        "description": "Duplicate record",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    },
+                    "422": {
+                        "description": "Form validation error",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Reset Password",
+                "parameters": [
+                    {
+                        "description": "Request request",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/resetPasswordDomain.ReqResetPassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/resetPasswordDomain.ReqResetPassword"
+                        }
+                    },
+                    "409": {
+                        "description": "Duplicate record",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    },
+                    "422": {
+                        "description": "Form validation error",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/errorDomain.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -284,6 +378,32 @@ const docTemplatev1 = `{
             "properties": {
                 "error": {
                     "$ref": "#/definitions/errorDomain.Error"
+                }
+            }
+        },
+        "resetPasswordDomain.ReqCreate": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "resetPasswordDomain.ReqResetPassword": {
+            "type": "object",
+            "required": [
+                "code",
+                "password"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
                 }
             }
         }
