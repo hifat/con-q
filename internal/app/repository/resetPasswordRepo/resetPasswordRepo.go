@@ -57,13 +57,32 @@ func (r *resetPasswordRepo) CanUsed(ctx context.Context, resetID uuid.UUID) (boo
 		Select("COUNT(*) > 0").
 		Where("id = ?", resetID).
 		Where("expires_at > ?", time.Now().Format(time.RFC3339)).
+		Where("used_at IS NULL").
+		Where("revoked_at IS NULL").
 		Find(&canUsed).Error
 }
 
 func (r *resetPasswordRepo) MakeUsed(ctx context.Context, resetID uuid.UUID) error {
+	timeNow := time.Now()
+
 	return r.db.Model(&model.ResetPassword{
 		ID: resetID,
 	}).Updates(model.ResetPassword{
-		IsUsed: true,
+		UsedAt: &timeNow,
 	}).Error
+}
+
+func (r *resetPasswordRepo) DeleteByCol(ctx context.Context, col string, expected any) error {
+	return r.db.Where(map[string]any{col: expected}).
+		Delete(&model.ResetPassword{}).Error
+}
+
+func (r *resetPasswordRepo) RevokedByCol(ctx context.Context, col string, expected any) error {
+	timeNow := time.Now()
+
+	return r.db.Model(&model.ResetPassword{}).
+		Where(map[string]any{col: expected}).
+		Updates(model.ResetPassword{
+			RevokedAt: &timeNow,
+		}).Error
 }
