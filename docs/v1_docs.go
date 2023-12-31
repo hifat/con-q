@@ -102,13 +102,7 @@ const docTemplatev1 = `{
                         }
                     },
                     "401": {
-                        "description": "Invalid Credentials",
-                        "schema": {
-                            "$ref": "#/definitions/errorDomain.Response"
-                        }
-                    },
-                    "422": {
-                        "description": "Form validation error",
+                        "description": "Revoked Token",
                         "schema": {
                             "$ref": "#/definitions/errorDomain.Response"
                         }
