@@ -33,13 +33,13 @@ type DBConfig struct {
 }
 
 type AuthConfig struct {
-	ApiKey                  string        `envconfig:"API_KEY_SECRET"`
-	AccessTokenSecret       string        `envconfig:"ACCESS_TOKEN_SECRET"`
-	AccessTokenDuration     time.Duration `envconfig:"ACCESS_TOKEN_DURATION"`
-	RefreshTokenSecret      string        `envconfig:"REFRESH_TOKEN_SECRET"`
-	RefreshTokenDuration    time.Duration `envconfig:"REFRESH_TOKEN_DURATION"`
-	MaxDevice               uint          `envconfig:"MAX_DEVICE"`
-	RESET_PASSWORD_DURATION time.Duration `envconfig:"RESET_PASSWORD_DURATION"`
+	ApiKey                string        `envconfig:"API_KEY_SECRET"`
+	AccessTokenSecret     string        `envconfig:"ACCESS_TOKEN_SECRET"`
+	AccessTokenDuration   time.Duration `envconfig:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenSecret    string        `envconfig:"REFRESH_TOKEN_SECRET"`
+	RefreshTokenDuration  time.Duration `envconfig:"REFRESH_TOKEN_DURATION"`
+	MaxDevice             uint          `envconfig:"MAX_DEVICE"`
+	ResetPasswordDuration time.Duration `envconfig:"RESET_PASSWORD_DURATION"`
 }
 
 func (c *AppConfig) Init() {

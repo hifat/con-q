@@ -73,7 +73,7 @@ func (s *resetPasswordService) Request(ctx context.Context, req resetPasswordDom
 		UserID:    user.ID,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,
-		ExpiresAt: time.Now().Add(s.cfg.Auth.RESET_PASSWORD_DURATION),
+		ExpiresAt: time.Now().Add(s.cfg.Auth.ResetPasswordDuration),
 	}
 
 	err = s.resetPasswordRepo.Create(ctx, req)
