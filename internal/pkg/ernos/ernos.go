@@ -72,6 +72,19 @@ func RevokedToken() error {
 	}
 }
 
+func BadRequestError(messages ...string) error {
+	msg := commonConst.Msg.BAD_REQUEST
+	if len(messages) > 0 {
+		msg = strings.Join(messages, "")
+	}
+
+	return errorDomain.Error{
+		Status:  http.StatusBadRequest,
+		Message: msg,
+		Code:    commonConst.Code.BAD_REQUEST,
+	}
+}
+
 func InternalServerError(messages ...string) error {
 	msg := commonConst.Code.INTERNAL_SERVER_ERROR
 	if len(messages) > 0 {
