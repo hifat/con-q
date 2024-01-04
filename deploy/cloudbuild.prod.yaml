@@ -1,0 +1,42 @@
+steps:
+   - name: gcr.io/cloud-builders/docker
+     args:
+        - build
+        - '-t'
+        - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:latest'
+        - .
+        - '-f'
+        - Dockerfile
+     id: Build
+
+   - name: gcr.io/cloud-builders/docker
+     args:
+        - push
+        - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:latest'
+     id: Push
+
+   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+     args:
+        - run
+        - deploy
+        - $_SERVICE_NAME
+        - '--platform=managed'
+        - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:latest'
+        - '--region=$_DEPLOY_REGION'
+        - '--allow-unauthenticated'
+        - '--port=8000'
+        - '--quiet'
+        - '--set-secrets=/config/env/.env=$_SECRET_PATH'
+
+     id: Deploy
+     entrypoint: gcloud
+
+options:
+   substitutionOption: ALLOW_LOOSE
+   logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+   _DEPLOY_REGION: 'asia-southeast1'
+   _GCR_HOSTNAME: 'asia.gcr.io'
+   _SERVICE_NAME: 'con-q-prod'
+   _SECRET_PATH: ''

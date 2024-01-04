@@ -27,7 +27,7 @@ func (m *AuthMiddleware) AuthGuard() gin.HandlerFunc {
 		authHeader := ctx.Request.Header.Get("Authorization")
 		if authHeader == "" {
 			httpResponse.Error(ctx, errorDomain.Error{
-				Status:  http.StatusBadRequest,
+				Status:  http.StatusUnauthorized,
 				Message: authConst.Msg.NO_AUTHORIZATION_HEADER,
 				Code:    authConst.Code.NO_AUTHORIZATION_HEADER,
 			})
