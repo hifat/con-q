@@ -56,4 +56,8 @@ func (r *route) Register() {
 	resetPasswordHandler := r.handler.ResetPassword
 	authRoute.POST("/reset-password", resetPasswordHandler.Request)
 	authRoute.PATCH("/reset-password", resetPasswordHandler.Reset)
+
+	userRoute := v1.Group("users")
+	userHandler := r.handler.User
+	userRoute.GET("", userHandler.Get)
 }
