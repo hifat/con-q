@@ -14,6 +14,7 @@ import (
 	"github.com/hifat/con-q-api/internal/app/handler/authHandler"
 	"github.com/hifat/con-q-api/internal/app/handler/healtzHandler"
 	"github.com/hifat/con-q-api/internal/app/handler/resetPasswordHandler"
+	"github.com/hifat/con-q-api/internal/app/handler/userHandler"
 	"github.com/hifat/con-q-api/internal/app/middleware"
 	"github.com/hifat/con-q-api/internal/app/middleware/authMiddleware"
 	"github.com/hifat/con-q-api/internal/app/repository/authRepo"
@@ -22,6 +23,7 @@ import (
 	"github.com/hifat/con-q-api/internal/app/service/authService"
 	"github.com/hifat/con-q-api/internal/app/service/middlewareService"
 	"github.com/hifat/con-q-api/internal/app/service/resetPasswordService"
+	"github.com/hifat/con-q-api/internal/app/service/userService"
 )
 
 // Injectors from wire.go:
@@ -36,7 +38,9 @@ func InitializeAPI(cfg config.AppConfig) (Adapter, func()) {
 	iResetPasswordRepo := resetPasswordRepo.New(db)
 	iResetPasswordService := resetPasswordService.New(cfg, iResetPasswordRepo, iUserRepo)
 	resetPasswordHandlerResetPasswordHandler := resetPasswordHandler.New(iResetPasswordService)
-	handlerHandler := handler.New(healtzHandlerHealtzHandler, authHandlerAuthHandler, resetPasswordHandlerResetPasswordHandler)
+	iUserService := userService.New(iUserRepo)
+	userHandlerUserHandler := userHandler.New(iUserService)
+	handlerHandler := handler.New(healtzHandlerHealtzHandler, authHandlerAuthHandler, resetPasswordHandlerResetPasswordHandler, userHandlerUserHandler)
 	iMiddlewareService := middlewareService.New(cfg, iAuthRepo, iUserRepo)
 	authMiddlewareAuthMiddleware := authMiddleware.New(cfg, iMiddlewareService)
 	middlewareMiddleware := middleware.New(authMiddlewareAuthMiddleware)
@@ -48,10 +52,10 @@ func InitializeAPI(cfg config.AppConfig) (Adapter, func()) {
 
 // wire.go:
 
-var RepoSet = wire.NewSet(database.NewPostgresConnection, authRepo.New, userRepo.New, resetPasswordRepo.New)
+var RepoSet = wire.NewSet(database.NewPostgresConnection, authRepo.New, resetPasswordRepo.New, userRepo.New)
 
-var ServiceSet = wire.NewSet(authService.New, middlewareService.New, resetPasswordService.New)
+var ServiceSet = wire.NewSet(authService.New, middlewareService.New, resetPasswordService.New, userService.New)
 
-var HandlerSet = wire.NewSet(handler.New, middleware.New, authMiddleware.New, healtzHandler.New, authHandler.New, resetPasswordHandler.New)
+var HandlerSet = wire.NewSet(handler.New, middleware.New, authMiddleware.New, healtzHandler.New, authHandler.New, resetPasswordHandler.New, userHandler.New)
 
 var AdapterSet = wire.NewSet(NewAdapter)

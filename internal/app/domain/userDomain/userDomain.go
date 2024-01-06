@@ -5,12 +5,18 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/hifat/con-q-api/internal/app/domain/commonDomain"
 )
 
 type IUserRepo interface {
+	Get(ctx context.Context, query commonDomain.ReqQuery) ([]User, error)
 	Exists(col string, expected string) (bool, error)
 	FirstByCol(ctx context.Context, user *User, col string, expected any) error
 	UpdatePassword(ctx context.Context, userID uuid.UUID, req ReqUpdatePassword) error
+}
+
+type IUserService interface {
+	Get(ctx context.Context, query commonDomain.ReqQuery) ([]User, error)
 }
 
 type User struct {
