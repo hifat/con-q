@@ -46,14 +46,14 @@ func (c *AppConfig) initConfig() (err error) {
 
 	err = viper.ReadInConfig()
 	if err != nil {
-		return
+		return err
 	}
 
 	viper.Unmarshal(&c.Env)
 	viper.Unmarshal(&c.DB)
 	viper.Unmarshal(&c.Auth)
 
-	return
+	return nil
 }
 
 func LoadAppConfig() *AppConfig {
