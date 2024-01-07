@@ -12,4 +12,7 @@ FROM scratch
 COPY --from=builder ./rest-api /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
+# for run in local
+# COPY /config/env/.env /config/env/  
+
 ENTRYPOINT ["/rest-api"]

@@ -1,13 +1,9 @@
 package config
 
 import (
-	"fmt"
-	"path/filepath"
-	"runtime"
 	"time"
 
-	"github.com/joho/godotenv"
-	"github.com/kelseyhightower/envconfig"
+	"github.com/spf13/viper"
 )
 
 type AppConfig struct {
@@ -17,50 +13,56 @@ type AppConfig struct {
 }
 
 type EnvConfig struct {
-	AppMode   string `envconfig:"APP_MODE"`
-	AppHost   string `envconfig:"APP_HOST"`
-	AppName   string `envconfig:"APP_NAME"`
-	AppPort   string `envconfig:"APP_PORT"`
-	SecretKey string `envconfig:"SECRET_KEY"`
+	AppMode string `mapstructure:"APP_MODE"`
+	AppHost string `mapstructure:"APP_HOST"`
+	AppName string `mapstructure:"APP_NAME"`
+	AppPort string `mapstructure:"APP_PORT"`
 }
 
 type DBConfig struct {
-	Host     string `envconfig:"DB_HOST"`
-	Port     string `envconfig:"DB_PORT"`
-	Name     string `envconfig:"DB_NAME"`
-	Username string `envconfig:"DB_USERNAME"`
-	Password string `envconfig:"DB_PASSWORD"`
+	Host     string `mapstructure:"DB_HOST"`
+	Port     string `mapstructure:"DB_PORT"`
+	Name     string `mapstructure:"DB_NAME"`
+	Username string `mapstructure:"DB_USERNAME"`
+	Password string `mapstructure:"DB_PASSWORD"`
 }
 
 type AuthConfig struct {
-	ApiKey                string        `envconfig:"API_KEY_SECRET"`
-	AccessTokenSecret     string        `envconfig:"ACCESS_TOKEN_SECRET"`
-	AccessTokenDuration   time.Duration `envconfig:"ACCESS_TOKEN_DURATION"`
-	RefreshTokenSecret    string        `envconfig:"REFRESH_TOKEN_SECRET"`
-	RefreshTokenDuration  time.Duration `envconfig:"REFRESH_TOKEN_DURATION"`
-	MaxDevice             uint          `envconfig:"MAX_DEVICE"`
-	ResetPasswordDuration time.Duration `envconfig:"RESET_PASSWORD_DURATION"`
+	ApiKey                string        `mapstructure:"API_KEY_SECRET"`
+	AccessTokenSecret     string        `mapstructure:"ACCESS_TOKEN_SECRET"`
+	AccessTokenDuration   time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenSecret    string        `mapstructure:"REFRESH_TOKEN_SECRET"`
+	RefreshTokenDuration  time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
+	MaxDevice             uint          `mapstructure:"MAX_DEVICE"`
+	ResetPasswordDuration time.Duration `mapstructure:"RESET_PASSWORD_DURATION"`
 }
 
-func (c *AppConfig) Init() {
-	envconfig.MustProcess("", &c.Env)
-	envconfig.MustProcess("", &c.DB)
-	envconfig.MustProcess("", &c.Auth)
+func (c *AppConfig) initConfig() (err error) {
+	viper.AddConfigPath("./config/env/")
+	viper.SetConfigName(".env")
+	viper.SetConfigType("env")
+
+	viper.AutomaticEnv()
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+
+	viper.Unmarshal(&c.Env)
+	viper.Unmarshal(&c.DB)
+	viper.Unmarshal(&c.Auth)
+
+	return nil
 }
 
 func LoadAppConfig() *AppConfig {
-	_, b, _, _ := runtime.Caller(0)
-	basePath := filepath.Dir(b)
+	appCfg := AppConfig{}
 
-	err := godotenv.Load(fmt.Sprintf("%v/../../../config/env/.env", basePath))
+	err := appCfg.initConfig()
 	if err != nil {
-		err = godotenv.Load()
-		if err != nil {
-			panic(err)
-		}
+		panic(err)
 	}
 
-	appCfg := AppConfig{}
-	appCfg.Init()
 	return &appCfg
 }
