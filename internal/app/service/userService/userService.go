@@ -2,6 +2,7 @@ package userService
 
 import (
 	"context"
+	"errors"
 
 	"github.com/hifat/con-q-api/internal/app/domain/commonDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
@@ -21,6 +22,12 @@ func New(userRepo userDomain.IUserRepo) userDomain.IUserService {
 }
 
 func (s *userService) Get(ctx context.Context, query commonDomain.ReqQuery) (users []userDomain.User, err error) {
+	if true {
+		zlog.Info("test log on cloud")
+		zlog.Error(errors.New("boommmmmm funk error!"))
+		return users, ernos.InternalServerError()
+	}
+
 	searchBy := "name, username"
 	query.SearchBy = &searchBy
 	users, err = s.userRepo.Get(ctx, query)
