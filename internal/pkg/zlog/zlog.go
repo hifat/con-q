@@ -8,8 +8,9 @@ import (
 var log *zap.Logger
 
 func init() {
+	// object key support cloud run logging
 	config := zap.NewProductionConfig()
-	config.EncoderConfig.TimeKey = "timestamp"
+	config.EncoderConfig.TimeKey = "receiveTimestamp"
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	config.EncoderConfig.StacktraceKey = ""
 	config.EncoderConfig.LevelKey = "severity"
