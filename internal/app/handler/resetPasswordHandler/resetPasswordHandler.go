@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/resetPasswordDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
 )
@@ -43,8 +44,8 @@ func (h *ResetPasswordHandler) Request(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "ok",
+	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
+		Message: "ok",
 	})
 }
 
@@ -72,7 +73,7 @@ func (h *ResetPasswordHandler) Reset(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "ok",
+	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
+		Message: "ok",
 	})
 }

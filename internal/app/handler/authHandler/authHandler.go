@@ -45,8 +45,8 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "ok",
+	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
+		Message: "ok",
 	})
 }
 

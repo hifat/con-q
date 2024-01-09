@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hifat/con-q-api/internal/app/domain/commonDomain"
+	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
 )
@@ -43,7 +44,13 @@ func (h *UserHandler) Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"users": users,
+	total := 0
+	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
+		Items: users,
+		Meta: &httpDomain.ResMeta{
+			Total:   &total,
+			Page:    reqQuery.Page,
+			PerPage: reqQuery.PerPage,
+		},
 	})
 }

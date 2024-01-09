@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 )
 
 type HealtzHandler struct{}
@@ -19,7 +20,7 @@ func New() HealtzHandler {
 // @Router		/healtz [get]
 // @Param		Body body authDomain.ReqRegister true "Register request"
 func (h *HealtzHandler) Get(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "ok",
+	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
+		Message: "ok",
 	})
 }

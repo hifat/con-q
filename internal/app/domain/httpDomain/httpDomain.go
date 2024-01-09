@@ -8,7 +8,7 @@ type ResSucces struct {
 }
 
 type ResMeta struct {
-	Total   uint `json:"total,omitempty"`
-	Page    uint `json:"page,omitempty"`
-	PerPage uint `json:"perPage,omitempty"`
+	Total   *int `json:"total,omitempty"`
+	Page    *int `json:"page,omitempty"`
+	PerPage *int `json:"perPage,omitempty"`
 }
