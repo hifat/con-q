@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 )
 
 type IResetPasswordRepo interface {
@@ -17,8 +18,8 @@ type IResetPasswordRepo interface {
 }
 
 type IResetPasswordService interface {
-	Request(ctx context.Context, req ReqCreate) error
-	Reset(ctx context.Context, req ReqResetPassword) error
+	Request(ctx context.Context, req ReqCreate) (*httpDomain.ResSucces[any], error)
+	Reset(ctx context.Context, req ReqResetPassword) (*httpDomain.ResSucces[any], error)
 }
 
 type ResetPassword struct {

@@ -1,14 +1,18 @@
 package httpDomain
 
-type ResSucces struct {
-	Item    any      `json:"item,omitempty"`
-	Items   any      `json:"items,omitempty"`
+type ResSucces[T any] struct {
+	Item    *T       `json:"item,omitempty"`
+	Items   []T      `json:"items,omitempty"`
 	Message string   `json:"message,omitempty"`
 	Meta    *ResMeta `json:"meta,omitempty"`
 }
 
+type Pagination struct {
+	Total   *int64 `json:"total,omitempty"`
+	Page    *int   `json:"page,omitempty"`
+	PerPage *int   `json:"perPage,omitempty"`
+}
+
 type ResMeta struct {
-	Total   *int `json:"total,omitempty"`
-	Page    *int `json:"page,omitempty"`
-	PerPage *int `json:"perPage,omitempty"`
+	Pagination *Pagination `json:"pagination"`
 }

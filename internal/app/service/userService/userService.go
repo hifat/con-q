@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hifat/con-q-api/internal/app/domain/commonDomain"
+	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
 	"github.com/hifat/con-q-api/internal/app/repository"
 	"github.com/hifat/con-q-api/internal/pkg/ernos"
@@ -20,18 +21,29 @@ func New(userRepo userDomain.IUserRepo) userDomain.IUserService {
 	}
 }
 
-func (s *userService) Get(ctx context.Context, query commonDomain.ReqQuery) (users []userDomain.User, err error) {
+func (s *userService) Get(ctx context.Context, query commonDomain.ReqQuery) (*httpDomain.ResSucces[userDomain.User], error) {
 	searchBy := "name, username"
 	query.SearchBy = &searchBy
-	users, err = s.userRepo.Get(ctx, query)
+	users, total, err := s.userRepo.Get(ctx, query)
 	if err != nil {
 		if e, ok := err.(repository.Error); ok {
-			return users, ernos.BadRequestError(e.Message)
+			return nil, ernos.BadRequestError(e.Message)
 		}
 
 		zlog.Error(err)
-		return users, ernos.InternalServerError()
+		return nil, ernos.InternalServerError()
 	}
 
-	return users, nil
+	res := &httpDomain.ResSucces[userDomain.User]{
+		Items: users,
+		Meta: &httpDomain.ResMeta{
+			Pagination: &httpDomain.Pagination{
+				Total:   &total,
+				Page:    query.Page,
+				PerPage: query.PerPage,
+			},
+		},
+	}
+
+	return res, nil
 }
