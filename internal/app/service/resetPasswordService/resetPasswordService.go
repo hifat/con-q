@@ -11,6 +11,7 @@ import (
 	"github.com/hifat/con-q-api/internal/app/constant/commonConst"
 	"github.com/hifat/con-q-api/internal/app/constant/resetPasswordConst"
 	"github.com/hifat/con-q-api/internal/app/domain/errorDomain"
+	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/resetPasswordDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
 	"github.com/hifat/con-q-api/internal/pkg/ernos"
@@ -38,30 +39,22 @@ func New(
 	}
 }
 
-func (s *resetPasswordService) Request(ctx context.Context, req resetPasswordDomain.ReqCreate) error {
+func (s *resetPasswordService) Request(ctx context.Context, req resetPasswordDomain.ReqCreate) (*httpDomain.ResSucces[any], error) {
 	var user userDomain.User
 	err := s.userRepo.FirstByCol(ctx, &user, "email", req.Email)
 	if err != nil {
 		if err.Error() == commonConst.Msg.RECORD_NOTFOUND {
-			return ernos.RecordNotFound("user")
+			return nil, ernos.RecordNotFound("user")
 		}
 
 		zlog.Error(err)
-		return errorDomain.Error{
-			Status:  http.StatusInternalServerError,
-			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
-			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
-		}
+		return nil, ernos.InternalServerError()
 	}
 
 	err = s.resetPasswordRepo.RevokedByCol(ctx, "user_id", user.ID)
 	if err != nil {
 		zlog.Error(err)
-		return errorDomain.Error{
-			Status:  http.StatusInternalServerError,
-			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
-			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
-		}
+		return nil, ernos.InternalServerError()
 	}
 
 	newID := uuid.New()
@@ -79,11 +72,7 @@ func (s *resetPasswordService) Request(ctx context.Context, req resetPasswordDom
 	err = s.resetPasswordRepo.Create(ctx, req)
 	if err != nil {
 		zlog.Error(err)
-		return errorDomain.Error{
-			Status:  http.StatusInternalServerError,
-			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
-			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
-		}
+		return nil, ernos.InternalServerError()
 	}
 
 	reqSendEmail := mailer.ReqSendEmail{
@@ -101,39 +90,34 @@ func (s *resetPasswordService) Request(ctx context.Context, req resetPasswordDom
 			zlog.Error(err)
 		}
 	}
-
 	go sendEmail()
 
-	return nil
+	res := &httpDomain.ResSucces[any]{
+		Message: "ok",
+	}
+
+	return res, nil
 }
 
-func (s *resetPasswordService) Reset(ctx context.Context, req resetPasswordDomain.ReqResetPassword) error {
+func (s *resetPasswordService) Reset(ctx context.Context, req resetPasswordDomain.ReqResetPassword) (*httpDomain.ResSucces[any], error) {
 	reset, err := s.resetPasswordRepo.FirstByCol(ctx, "code", req.Code)
 	if err != nil {
 		if err.Error() == commonConst.Msg.RECORD_NOTFOUND {
-			return ernos.RecordNotFound("reset password request")
+			return nil, ernos.RecordNotFound("reset password request")
 		}
 
 		zlog.Error(err)
-		return errorDomain.Error{
-			Status:  http.StatusInternalServerError,
-			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
-			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
-		}
+		return nil, ernos.InternalServerError()
 	}
 
 	canUsed, err := s.resetPasswordRepo.CanUsed(ctx, reset.ID)
 	if err != nil {
 		zlog.Error(err)
-		return errorDomain.Error{
-			Status:  http.StatusInternalServerError,
-			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
-			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
-		}
+		return nil, ernos.InternalServerError()
 	}
 
 	if !canUsed {
-		return errorDomain.Error{
+		return nil, errorDomain.Error{
 			Status:  http.StatusBadRequest,
 			Message: resetPasswordConst.Msg.CAN_NOT_USED,
 			Code:    resetPasswordConst.Code.CAN_NOT_USED,
@@ -143,11 +127,7 @@ func (s *resetPasswordService) Reset(ctx context.Context, req resetPasswordDomai
 	hashedPassword, err := helper.HashPassword(req.Password)
 	if err != nil {
 		zlog.Error(err)
-		return errorDomain.Error{
-			Status:  http.StatusInternalServerError,
-			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
-			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
-		}
+		return nil, ernos.InternalServerError()
 	}
 
 	reqResetPassword := userDomain.ReqUpdatePassword{
@@ -156,11 +136,7 @@ func (s *resetPasswordService) Reset(ctx context.Context, req resetPasswordDomai
 	err = s.userRepo.UpdatePassword(ctx, reset.UserID, reqResetPassword)
 	if err != nil {
 		zlog.Error(err)
-		return errorDomain.Error{
-			Status:  http.StatusInternalServerError,
-			Message: commonConst.Msg.INTERNAL_SERVER_ERROR,
-			Code:    commonConst.Code.INTERNAL_SERVER_ERROR,
-		}
+		return nil, ernos.InternalServerError()
 	}
 
 	makeUsed := func() {
@@ -169,5 +145,9 @@ func (s *resetPasswordService) Reset(ctx context.Context, req resetPasswordDomai
 	}
 	go makeUsed()
 
-	return nil
+	res := &httpDomain.ResSucces[any]{
+		Message: "ok",
+	}
+
+	return res, nil
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/userDomain"
 )
 
@@ -18,10 +19,10 @@ type IAuthRepo interface {
 }
 
 type IAuthService interface {
-	Register(ctx context.Context, req ReqRegister) error
-	Login(ctx context.Context, req ReqLogin) (*ResToken, error)
-	Logout(ctx context.Context, tokenID uuid.UUID) error
-	RefreshToken(ctx context.Context, passport Passport, req ReqRefreshToken) (*ResToken, error)
+	Register(ctx context.Context, req ReqRegister) (*httpDomain.ResSucces[any], error)
+	Login(ctx context.Context, req ReqLogin) (*httpDomain.ResSucces[ResToken], error)
+	Logout(ctx context.Context, tokenID uuid.UUID) (*httpDomain.ResSucces[any], error)
+	RefreshToken(ctx context.Context, passport Passport, req ReqRefreshToken) (*httpDomain.ResSucces[ResToken], error)
 }
 
 type ReqRegister struct {

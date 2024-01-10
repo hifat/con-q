@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hifat/con-q-api/internal/app/config"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
-	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
 	"github.com/hifat/con-q-api/internal/pkg/token"
 )
@@ -39,15 +38,13 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 		return
 	}
 
-	err = h.authService.Register(ctx.Request.Context(), req)
+	res, err := h.authService.Register(ctx.Request.Context(), req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
-		Message: "ok",
-	})
+	ctx.JSON(http.StatusOK, res)
 }
 
 // @Summary		Login
@@ -77,9 +74,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
-		Item: res,
-	})
+	ctx.JSON(http.StatusOK, res)
 }
 
 // @Summary		Refresh Token
@@ -106,7 +101,5 @@ func (h *AuthHandler) RefreshToken(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
-		Item: res,
-	})
+	ctx.JSON(http.StatusOK, res)
 }

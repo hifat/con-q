@@ -86,7 +86,7 @@ func BadRequestError(messages ...string) error {
 }
 
 func InternalServerError(messages ...string) error {
-	msg := commonConst.Code.INTERNAL_SERVER_ERROR
+	msg := commonConst.Msg.INTERNAL_SERVER_ERROR
 	if len(messages) > 0 {
 		msg = strings.Join(messages, "")
 	}

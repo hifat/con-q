@@ -20,7 +20,7 @@ func New() HealtzHandler {
 // @Router		/healtz [get]
 // @Param		Body body authDomain.ReqRegister true "Register request"
 func (h *HealtzHandler) Get(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
+	ctx.JSON(http.StatusOK, httpDomain.ResSucces[any]{
 		Message: "ok",
 	})
 }

@@ -23,19 +23,22 @@ func New(db *gorm.DB) userDomain.IUserRepo {
 	return &userRepo{db}
 }
 
-func (r *userRepo) Get(ctx context.Context, query commonDomain.ReqQuery) (users []userDomain.User, err error) {
+func (r *userRepo) Get(ctx context.Context, query commonDomain.ReqQuery) (users []userDomain.User, total int64, err error) {
 	tx := r.db.Model(&model.User{})
 
 	reqQuery := repository.NewQueryRequest(tx, fields, query)
 	err = reqQuery.Validate()
 	if err != nil {
-		return users, err
+		return users, total, err
 	}
 	reqQuery.Search(repository.CONTAIN, repository.OR)
 	reqQuery.Sort()
+
+	tx.Count(&total)
+
 	reqQuery.Pagination()
 
-	return users, tx.Find(&users).Error
+	return users, total, tx.Find(&users).Error
 }
 
 func (r *userRepo) Exists(col string, expected string) (exists bool, err error) {

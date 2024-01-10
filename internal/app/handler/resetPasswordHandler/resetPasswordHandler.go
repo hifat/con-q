@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hifat/con-q-api/internal/app/domain/httpDomain"
 	"github.com/hifat/con-q-api/internal/app/domain/resetPasswordDomain"
 	"github.com/hifat/con-q-api/internal/app/handler/httpResponse"
 )
@@ -38,15 +37,13 @@ func (h *ResetPasswordHandler) Request(ctx *gin.Context) {
 	req.ClientIP = ctx.ClientIP()
 	req.Agent = ctx.Request.UserAgent()
 
-	err = h.resetPasswordService.Request(ctx.Request.Context(), req)
+	res, err := h.resetPasswordService.Request(ctx.Request.Context(), req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
-		Message: "ok",
-	})
+	ctx.JSON(http.StatusOK, res)
 }
 
 // @Summary		Reset Password
@@ -67,13 +64,11 @@ func (h *ResetPasswordHandler) Reset(ctx *gin.Context) {
 		return
 	}
 
-	err = h.resetPasswordService.Reset(ctx.Request.Context(), req)
+	res, err := h.resetPasswordService.Reset(ctx.Request.Context(), req)
 	if err != nil {
 		httpResponse.Error(ctx, err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, httpDomain.ResSucces{
-		Message: "ok",
-	})
+	ctx.JSON(http.StatusOK, res)
 }
