@@ -54,11 +54,10 @@ func main() {
 	defer stop()
 
 	srv := &http.Server{
-		Addr:           cfg.Env.AppHost + ":" + cfg.Env.AppPort,
-		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
+		Addr:         cfg.Env.AppHost + ":" + cfg.Env.AppPort,
+		Handler:      router,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	go func() {
