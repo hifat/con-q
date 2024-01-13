@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/domain/resetPasswordDomain"
 	"github.com/hifat/con-q-api/internal/app/model"
+	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
 
@@ -36,19 +37,17 @@ func (r *resetPasswordRepo) Exists(ctx context.Context, resetID uuid.UUID) (bool
 }
 
 func (r *resetPasswordRepo) Create(ctx context.Context, req resetPasswordDomain.ReqCreate) error {
-	newID := uuid.New()
-	if req.ID != nil {
-		newID = *req.ID
+	var newResetPassword model.ResetPassword
+	err := copier.Copy(&newResetPassword, &req)
+	if err != nil {
+		return err
 	}
 
-	return r.db.Create(&model.ResetPassword{
-		ID:        newID,
-		Code:      req.Code,
-		Agent:     req.Agent,
-		ClientIP:  req.ClientIP,
-		ExpiresAt: req.ExpiresAt,
-		UserID:    req.UserID,
-	}).Error
+	if req.ID != nil {
+		newResetPassword.ID = uuid.New()
+	}
+
+	return r.db.Create(&newResetPassword).Error
 }
 
 func (r *resetPasswordRepo) CanUsed(ctx context.Context, resetID uuid.UUID) (bool, error) {
