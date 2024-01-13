@@ -13,6 +13,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/google/uuid v1.4.0
 	github.com/google/wire v0.5.0
+	github.com/jinzhu/copier v0.4.0
 	github.com/spf13/viper v1.18.2
 	github.com/stoewer/go-strcase v1.3.0
 	github.com/swaggo/files v1.0.1

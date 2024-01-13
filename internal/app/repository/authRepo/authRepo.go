@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hifat/con-q-api/internal/app/domain/authDomain"
 	"github.com/hifat/con-q-api/internal/app/model"
+	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
 
@@ -28,12 +29,14 @@ func (r *authRepo) Exists(ctx context.Context, authID uuid.UUID) (bool, error) {
 }
 
 func (r *authRepo) Register(ctx context.Context, req authDomain.ReqRegister) error {
+	var newUser model.User
+	err := copier.Copy(&newUser, &req)
+	if err != nil {
+		return err
+	}
+
 	return r.db.WithContext(ctx).
-		Create(&model.User{
-			Username: req.Username,
-			Password: req.Password,
-			Name:     req.Name,
-		}).Error
+		Create(&newUser).Error
 }
 
 func (r *authRepo) Count(ctx context.Context, userID uuid.UUID) (int64, error) {
@@ -45,15 +48,14 @@ func (r *authRepo) Count(ctx context.Context, userID uuid.UUID) (int64, error) {
 }
 
 func (r *authRepo) Save(ctx context.Context, req authDomain.ReqAuth) error {
-	return r.db.WithContext(ctx).
-		Save(&model.Auth{
-			ID:        req.ID,
-			Agent:     req.Agent,
-			ClientIP:  req.ClientIP,
-			ExpiresAt: req.ExpiresAt,
+	var newUser model.Auth
+	err := copier.Copy(&newUser, &req)
+	if err != nil {
+		return err
+	}
 
-			UserID: req.UserID,
-		}).Error
+	return r.db.WithContext(ctx).
+		Save(&newUser).Error
 }
 
 func (r *authRepo) Delete(ctx context.Context, authID uuid.UUID) error {
