@@ -54,9 +54,9 @@ func (r *userRepo) FirstByCol(ctx context.Context, user *userDomain.User, col st
 		First(&user).Error
 }
 
-func (r *userRepo) UpdatePassword(ctx context.Context, userID uuid.UUID, req userDomain.ReqUpdatePassword) error {
+func (r *userRepo) UpdatePassword(ctx context.Context, userId uuid.UUID, req userDomain.ReqUpdatePassword) error {
 	return r.db.Model(&model.User{
-		ID: userID,
+		Id: userId,
 	}).Updates(model.User{
 		Password: req.Password,
 	}).Error

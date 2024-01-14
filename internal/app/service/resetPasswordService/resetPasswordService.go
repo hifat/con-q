@@ -51,19 +51,19 @@ func (s *resetPasswordService) Request(ctx context.Context, req resetPasswordDom
 		return nil, ernos.InternalServerError()
 	}
 
-	err = s.resetPasswordRepo.RevokedByCol(ctx, "user_id", user.ID)
+	err = s.resetPasswordRepo.RevokedByCol(ctx, "user_id", user.Id)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 
-	newID := uuid.New()
-	code := strings.Split(newID.String(), "-")[0]
+	newId := uuid.New()
+	code := strings.Split(newId.String(), "-")[0]
 	req = resetPasswordDomain.ReqCreate{
-		ID:        &newID,
+		Id:        &newId,
 		Email:     user.Email,
 		Code:      code,
-		UserID:    user.ID,
+		UserId:    user.Id,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,
 		ExpiresAt: time.Now().Add(s.cfg.Auth.ResetPasswordDuration),
@@ -110,7 +110,7 @@ func (s *resetPasswordService) Reset(ctx context.Context, req resetPasswordDomai
 		return nil, ernos.InternalServerError()
 	}
 
-	canUsed, err := s.resetPasswordRepo.CanUsed(ctx, reset.ID)
+	canUsed, err := s.resetPasswordRepo.CanUsed(ctx, reset.Id)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
@@ -133,14 +133,14 @@ func (s *resetPasswordService) Reset(ctx context.Context, req resetPasswordDomai
 	reqResetPassword := userDomain.ReqUpdatePassword{
 		Password: hashedPassword,
 	}
-	err = s.userRepo.UpdatePassword(ctx, reset.UserID, reqResetPassword)
+	err = s.userRepo.UpdatePassword(ctx, reset.UserId, reqResetPassword)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 
 	makeUsed := func() {
-		err := s.resetPasswordRepo.MakeUsed(ctx, reset.ID)
+		err := s.resetPasswordRepo.MakeUsed(ctx, reset.Id)
 		zlog.Error(err)
 	}
 	go makeUsed()
