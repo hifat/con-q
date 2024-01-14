@@ -8,7 +8,7 @@ import (
 )
 
 type ResetPassword struct {
-	ID        uuid.UUID  `gorm:"primaryKey; type:uuid; default:uuid_generate_v4()" json:"id"`
+	Id        uuid.UUID  `gorm:"primaryKey; type:uuid; default:uuid_generate_v4()" json:"id"`
 	Code      string     `gorm:"type:varchar(20)" json:"code"`
 	Agent     string     `gorm:"type:varchar(100)" json:"agent"`
 	ClientIP  string     `gorm:"type:varchar(30)" json:"clientIP"`
@@ -16,7 +16,7 @@ type ResetPassword struct {
 	RevokedAt *time.Time `json:"revokedAt"`
 	ExpiresAt time.Time  `json:"expiresAt"`
 
-	UserID uuid.UUID `gorm:"type:uuid" json:"userID"`
+	UserId uuid.UUID `gorm:"type:uuid" json:"userId"`
 	User   User      `json:"user"`
 
 	CreatedAt time.Time      `json:"createdAt"`
