@@ -28,11 +28,11 @@ func (r *resetPasswordRepo) FirstByCol(ctx context.Context, col string, expected
 		First(&res).Error
 }
 
-func (r *resetPasswordRepo) Exists(ctx context.Context, resetId uuid.UUID) (bool, error) {
+func (r *resetPasswordRepo) Exists(ctx context.Context, resetID uuid.UUID) (bool, error) {
 	var exists bool
 	return exists, r.db.Model(&model.ResetPassword{}).
 		Select("COUNT(*) > 0").
-		Where("id = ?", resetId).
+		Where("id = ?", resetID).
 		Find(&exists).Error
 }
 
@@ -43,29 +43,29 @@ func (r *resetPasswordRepo) Create(ctx context.Context, req resetPasswordDomain.
 		return err
 	}
 
-	if req.Id != nil {
-		newResetPassword.Id = uuid.New()
+	if req.ID != nil {
+		newResetPassword.ID = uuid.New()
 	}
 
 	return r.db.Create(&newResetPassword).Error
 }
 
-func (r *resetPasswordRepo) CanUsed(ctx context.Context, resetId uuid.UUID) (bool, error) {
+func (r *resetPasswordRepo) CanUsed(ctx context.Context, resetID uuid.UUID) (bool, error) {
 	var canUsed bool
 	return canUsed, r.db.Model(&model.ResetPassword{}).
 		Select("COUNT(*) > 0").
-		Where("id = ?", resetId).
+		Where("id = ?", resetID).
 		Where("expires_at > ?", time.Now().Format(time.RFC3339)).
 		Where("used_at IS NULL").
 		Where("revoked_at IS NULL").
 		Find(&canUsed).Error
 }
 
-func (r *resetPasswordRepo) MakeUsed(ctx context.Context, resetId uuid.UUID) error {
+func (r *resetPasswordRepo) MakeUsed(ctx context.Context, resetID uuid.UUID) error {
 	timeNow := time.Now()
 
 	return r.db.Model(&model.ResetPassword{
-		Id: resetId,
+		ID: resetID,
 	}).Updates(model.ResetPassword{
 		UsedAt: &timeNow,
 	}).Error
