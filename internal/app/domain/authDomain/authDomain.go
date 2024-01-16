@@ -10,18 +10,18 @@ import (
 )
 
 type IAuthRepo interface {
-	Exists(ctx context.Context, authId uuid.UUID) (bool, error)
+	Exists(ctx context.Context, authID uuid.UUID) (bool, error)
 	Register(ctx context.Context, req ReqRegister) error
-	Count(ctx context.Context, userId uuid.UUID) (int64, error)
+	Count(ctx context.Context, userID uuid.UUID) (int64, error)
 	Save(ctx context.Context, req ReqAuth) error
-	Delete(ctx context.Context, authId uuid.UUID) error
-	RemoveTokenExpires(ctx context.Context, userId uuid.UUID) error
+	Delete(ctx context.Context, authID uuid.UUID) error
+	RemoveTokenExpires(ctx context.Context, userID uuid.UUID) error
 }
 
 type IAuthService interface {
 	Register(ctx context.Context, req ReqRegister) (*httpDomain.ResSucces[any], error)
 	Login(ctx context.Context, req ReqLogin) (*httpDomain.ResSucces[ResToken], error)
-	Logout(ctx context.Context, tokenId uuid.UUID) (*httpDomain.ResSucces[any], error)
+	Logout(ctx context.Context, tokenID uuid.UUID) (*httpDomain.ResSucces[any], error)
 	RefreshToken(ctx context.Context, passport Passport, req ReqRefreshToken) (*httpDomain.ResSucces[ResToken], error)
 }
 
@@ -39,15 +39,15 @@ type ReqLogin struct {
 }
 
 type ReqAuth struct {
-	Id        uuid.UUID
+	ID        uuid.UUID
 	Agent     string
 	ClientIP  string
 	ExpiresAt time.Time
-	UserId    uuid.UUID
+	UserID    uuid.UUID
 }
 
 type Passport struct {
-	AuthId uuid.UUID
+	AuthID uuid.UUID
 	User   userDomain.User
 }
 

@@ -77,13 +77,13 @@ func (s *authService) Login(ctx context.Context, req authDomain.ReqLogin) (*http
 		return nil, ernos.InvalidCredentials()
 	}
 
-	err = s.authRepo.RemoveTokenExpires(ctx, user.Id)
+	err = s.authRepo.RemoveTokenExpires(ctx, user.ID)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 
-	count, err := s.authRepo.Count(ctx, user.Id)
+	count, err := s.authRepo.Count(ctx, user.ID)
 	if count >= int64(s.cfg.Auth.MaxDevice) {
 		return nil, ernos.Other(errorDomain.Error{
 			Status:  http.StatusForbidden,
@@ -94,13 +94,13 @@ func (s *authService) Login(ctx context.Context, req authDomain.ReqLogin) (*http
 
 	passport := &authDomain.Passport{
 		User: userDomain.User{
-			Id:       user.Id,
+			ID:       user.ID,
 			Username: user.Username,
 			Name:     user.Name,
 		},
 	}
 
-	passport.AuthId = uuid.New()
+	passport.AuthID = uuid.New()
 	resToken, exp, err := s.generateToken(*passport)
 	if err != nil {
 		zlog.Error(err)
@@ -108,10 +108,10 @@ func (s *authService) Login(ctx context.Context, req authDomain.ReqLogin) (*http
 	}
 
 	err = s.authRepo.Save(ctx, authDomain.ReqAuth{
-		Id:        passport.AuthId,
+		ID:        passport.AuthID,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,
-		UserId:    user.Id,
+		UserID:    user.ID,
 		ExpiresAt: exp.Refresh,
 	})
 	if err != nil {
@@ -126,8 +126,8 @@ func (s *authService) Login(ctx context.Context, req authDomain.ReqLogin) (*http
 	return res, nil
 }
 
-func (s *authService) Logout(ctx context.Context, tokenId uuid.UUID) (*httpDomain.ResSucces[any], error) {
-	err := s.authRepo.Delete(ctx, tokenId)
+func (s *authService) Logout(ctx context.Context, tokenID uuid.UUID) (*httpDomain.ResSucces[any], error) {
+	err := s.authRepo.Delete(ctx, tokenID)
 	if err != nil {
 		return nil, ernos.InternalServerError()
 	}
@@ -157,19 +157,19 @@ func (s *authService) RefreshToken(ctx context.Context, passport authDomain.Pass
 		return nil, ernos.InternalServerError()
 	}
 
-	authId := claims.Passport.AuthId
-	exists, err := s.authRepo.Exists(ctx, authId)
+	authID := claims.Passport.AuthID
+	exists, err := s.authRepo.Exists(ctx, authID)
 	if !exists {
 		return nil, ernos.RevokedToken()
 	}
 
-	err = s.authRepo.Delete(ctx, authId)
+	err = s.authRepo.Delete(ctx, authID)
 	if err != nil {
 		zlog.Error(err)
 		return nil, ernos.InternalServerError()
 	}
 
-	passport.AuthId = uuid.New()
+	passport.AuthID = uuid.New()
 	resToken, exp, err := s.generateToken(passport)
 	if err != nil {
 		zlog.Error(err)
@@ -177,10 +177,10 @@ func (s *authService) RefreshToken(ctx context.Context, passport authDomain.Pass
 	}
 
 	err = s.authRepo.Save(ctx, authDomain.ReqAuth{
-		Id:        passport.AuthId,
+		ID:        passport.AuthID,
 		Agent:     req.Agent,
 		ClientIP:  req.ClientIP,
-		UserId:    user.Id,
+		UserID:    user.ID,
 		ExpiresAt: exp.Refresh,
 	})
 	if err != nil {

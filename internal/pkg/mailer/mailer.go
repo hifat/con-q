@@ -11,7 +11,7 @@ import (
 type ReqSendEmail struct {
 	From          string `json:"From"`
 	To            string `json:"To"`
-	TemplateId    string `json:"TemplateId"`
+	TemplateID    string `json:"TemplateID"`
 	TemplateModel any    `json:"TemplateModel"`
 }
 

@@ -10,10 +10,10 @@ import (
 
 type IResetPasswordRepo interface {
 	FirstByCol(ctx context.Context, col string, expected any) (*ResetPassword, error)
-	Exists(ctx context.Context, resetId uuid.UUID) (bool, error)
+	Exists(ctx context.Context, resetID uuid.UUID) (bool, error)
 	Create(ctx context.Context, req ReqCreate) error
-	CanUsed(ctx context.Context, resetId uuid.UUID) (bool, error)
-	MakeUsed(ctx context.Context, resetId uuid.UUID) error
+	CanUsed(ctx context.Context, resetID uuid.UUID) (bool, error)
+	MakeUsed(ctx context.Context, resetID uuid.UUID) error
 	RevokedByCol(ctx context.Context, col string, expected any) error
 }
 
@@ -23,8 +23,8 @@ type IResetPasswordService interface {
 }
 
 type ResetPassword struct {
-	Id        uuid.UUID  `json:"id"`
-	UserId    uuid.UUID  `json:"userId"`
+	ID        uuid.UUID  `json:"id"`
+	UserID    uuid.UUID  `json:"userID"`
 	Code      string     `json:"code"`
 	Agent     string     `json:"agent"`
 	ClientIP  string     `json:"clientIP"`
@@ -37,9 +37,9 @@ type ResetPassword struct {
 
 type ReqCreate struct {
 	Email     string     `binding:"required" json:"email"`
-	Id        *uuid.UUID `json:"-"`
+	ID        *uuid.UUID `json:"-"`
 	Code      string     `json:"-"`
-	UserId    uuid.UUID  `json:"-"`
+	UserID    uuid.UUID  `json:"-"`
 	Agent     string     `json:"-"`
 	ClientIP  string     `json:"-"`
 	ExpiresAt time.Time  `json:"-"`

@@ -13,7 +13,7 @@ type IUserRepo interface {
 	Get(ctx context.Context, query commonDomain.ReqQuery) ([]User, int64, error)
 	Exists(col string, expected string) (bool, error)
 	FirstByCol(ctx context.Context, user *User, col string, expected any) error
-	UpdatePassword(ctx context.Context, userId uuid.UUID, req ReqUpdatePassword) error
+	UpdatePassword(ctx context.Context, userID uuid.UUID, req ReqUpdatePassword) error
 }
 
 type IUserService interface {
@@ -21,7 +21,7 @@ type IUserService interface {
 }
 
 type User struct {
-	Id        uuid.UUID  `json:"id" example:"60cf8c94-2c98..."`
+	ID        uuid.UUID  `json:"id" example:"60cf8c94-2c98..."`
 	Email     string     `json:"email" example:"conq@domain.com"`
 	Username  string     `json:"username" example:"conq"`
 	Name      string     `json:"name" example:"Corn Dog"`
