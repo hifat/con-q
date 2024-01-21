@@ -84,6 +84,11 @@ func (s *authService) Login(ctx context.Context, req authDomain.ReqLogin) (*http
 	}
 
 	count, err := s.authRepo.Count(ctx, user.ID)
+	if err != nil {
+		zlog.Error(err)
+		return nil, err
+	}
+
 	if count >= int64(s.cfg.Auth.MaxDevice) {
 		return nil, ernos.Other(errorDomain.Error{
 			Status:  http.StatusForbidden,
@@ -159,6 +164,11 @@ func (s *authService) RefreshToken(ctx context.Context, passport authDomain.Pass
 
 	authID := claims.Passport.AuthID
 	exists, err := s.authRepo.Exists(ctx, authID)
+	if err != nil {
+		zlog.Error(err)
+		return nil, err
+	}
+
 	if !exists {
 		return nil, ernos.RevokedToken()
 	}
