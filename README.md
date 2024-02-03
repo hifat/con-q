@@ -40,6 +40,20 @@ Fix wire.go in di Package Warning
       "editor.tabSize": 4
    }
    ```
+Config `launch.json` for debugging (optional)
+```json
+"version": "0.2.0",
+"configurations": [
+   {
+      "name": "Launch Package",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/rest",
+      "cwd": "${workspaceFolder}"
+   },
+]
+```
 
 ## Developing ConQ
 
